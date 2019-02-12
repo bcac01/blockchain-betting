@@ -19,6 +19,12 @@ contract BettingApp {
         totalBetDownAmount = 0;
     }
     
+    function destructor() public {
+        if(contractOwner == msg.sender) {
+            selfdestruct(contractOwner);
+        }
+    }
+    
     struct User {
         string password;
         address assignedAddress;
