@@ -130,6 +130,7 @@ super(props);
             <div className="row">
               <div className="col">
                 {dashboard}
+                <canvas className="history-chart" id="history-chart"></canvas>
               </div>
             </div>
         </div>
