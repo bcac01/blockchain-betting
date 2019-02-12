@@ -30,7 +30,8 @@ class Signup extends Component {
 
     state = {
         inputUsername: '',
-        inputPassword: ''
+        inputPassword: '',
+        disablebutton: false,
     };
 
     // update username state
@@ -67,6 +68,10 @@ class Signup extends Component {
             alert('Username or password field is empty');
             return;
         }
+        //disable click on elements until sign up return value
+        this.setState({
+            disablebutton: !this.state.disablebutton
+        });
         // check if username exist
         contractInstance.methods.checkIfUserExist(this.state.inputUsername).call().then(receipt => {
             if (!receipt) {
@@ -75,9 +80,23 @@ class Signup extends Component {
                     if (receipt > 0) {
                         // register user
                         contractInstance.methods.registerUser(this.state.inputUsername, this.state.inputPassword).send({ from: coinbaseAddress, gas: 200000 });
+                        this.setState({
+                            disablebutton: !this.state.disablebutton
+                        });
+                        this.setState({
+                            inputUsername: '',
+                            inputPassword: ''
+                        })
                     } else {
                         // create new account that will be available for new users
                         this.createNewAccount();
+                        this.setState({
+                            inputUsername: '',
+                            inputPassword: ''
+                        })
+                        this.setState({
+                            disablebutton: !this.state.disablebutton
+                        });
                     }
                 });
             } else {
@@ -99,7 +118,23 @@ class Signup extends Component {
                 <div>
                   <p className="passwordsu-help">Please enter your password.</p>
                 </div>
-                <button type="submit" onClick={this.signUp}>Sign up</button>
+                <button disabled={this.state.disablebutton} type="submit" onClick={this.signUp}>Sign up</button>
+                {
+                    this.state.disablebutton?
+                    <div className="loading-wrapper">
+                        <div className="row">
+                            <div className="col-sm-6 column-in-center">
+                                <h2>Signing up...</h2>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-sm-3 column-in-center">
+                                <div className="loader"></div>
+                            </div>
+                        </div>
+                    </div>
+                :null
+                }
             </div>
         );
     }
