@@ -26,6 +26,17 @@ web3.eth.getCoinbase().then(result => {
     coinbaseAddress = result;
 });
 
+/**
+ * Get user balance
+ */
+web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
+    if (err) {
+      console.error(err);
+    } else {
+      console.log('Contract balance: ' + balance);
+    }
+  });
+
 
 class Dashboard extends Component {
   constructor(dashboardProps) {

@@ -48,6 +48,11 @@ class Signup extends Component {
         });
     }
 
+    clearFields = () => {
+            this.inputUsernameVal.value = "";
+            this.inputPasswordVal.value = "";
+    }
+
     /**
      * Create new account
      */
@@ -83,23 +88,21 @@ class Signup extends Component {
                         this.setState({
                             disablebutton: !this.state.disablebutton
                         });
-                        this.setState({
-                            inputUsername: '',
-                            inputPassword: ''
-                        })
+                        this.clearFields();
                     } else {
-                        // create new account that will be available for new users
+                        // create new account that will be available for new users 
                         this.createNewAccount();
-                        this.setState({
-                            inputUsername: '',
-                            inputPassword: ''
-                        })
+                        this.clearFields();
                         this.setState({
                             disablebutton: !this.state.disablebutton
                         });
                     }
                 });
             } else {
+                this.clearFields();
+                this.setState({
+                    disablebutton: !this.state.disablebutton
+                });
                 alert('Username already exists.');
             }
         });
@@ -110,11 +113,13 @@ class Signup extends Component {
             <div className="signup-wrapper">
                 <h1>Register For An Account</h1>
                 <p>Insert username and password to register new account.</p>
-                <input  onChange={this.updateUsername} className="usernamesu" type="text" placeholder="Username"/>
+                <input  onChange={this.updateUsername} className="usernamesu" 
+                type="text" placeholder="Username" ref={el => this.inputUsernameVal = el}/>
                 <div>
                   <p className="usernamesu-help">Please enter your username.</p>
                 </div>
-                <input onChange={this.updatePassword} className="passwordsu" type="password" placeholder="Password"/>
+                <input onChange={this.updatePassword} className="passwordsu"
+                type="password" placeholder="Password" ref={el => this.inputPasswordVal = el}/>
                 <div>
                   <p className="passwordsu-help">Please enter your password.</p>
                 </div>
