@@ -32,6 +32,8 @@ class Signup extends Component {
         inputUsername: '',
         inputPassword: '',
         disablebutton: false,
+        successAlert: false,
+        successInfo: false,
     };
 
     // update username state
@@ -88,10 +90,22 @@ class Signup extends Component {
                         this.setState({
                             disablebutton: !this.state.disablebutton
                         });
+                        this.setState({
+                            successAlert: !this.state.successAlert
+                        });
                         this.clearFields();
                     } else {
+                        this.setState({
+                            successInfo: !this.state.successInfo
+                        });
                         // create new account that will be available for new users 
                         this.createNewAccount();
+                        this.setState({
+                            successInfo: !this.state.successInfo
+                        });
+                        this.setState({
+                            successAlert: !this.state.successAlert
+                        });
                         this.clearFields();
                         this.setState({
                             disablebutton: !this.state.disablebutton
@@ -139,6 +153,24 @@ class Signup extends Component {
                         </div>
                     </div>
                 :null
+                }
+                {
+                    this.state.successAlert?
+                        <div className="row">
+                            <div className="alert alert-success">
+                                <strong>Success!</strong> This alert box could indicate a successful or positive action.
+                            </div>
+                        </div>
+                    :null
+                }
+                {
+                    this.state.successInfo?
+                        <div className="row">
+                            <div className="alert alert-info">
+                                <strong>Info!</strong> Please wait until new address is genereted
+                            </div>
+                        </div>
+                    :null
                 }
             </div>
         );
