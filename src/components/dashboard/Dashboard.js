@@ -70,7 +70,7 @@ class Dashboard extends Component {
         }
         // check if time is right
         if (moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date())) < 0) {
-            alert("You\'ve missed your chance, time's up :(");
+            alert("You've missed your chance, time's up :(");
             return;
         }
         //disable click on elements until bet accepted
@@ -114,7 +114,7 @@ class Dashboard extends Component {
         }
         // check if time is right
         if (moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date())) < 0) {
-            alert("You\'ve missed your chance, time's up :(");
+            alert("You've missed your chance, time's up :(");
             return;
         }
         //disable click on elements until bet accepted
