@@ -7,7 +7,6 @@ class Graph extends React.Component {
 
     componentDidMount() {
         const node = this.node;
-        console.log(ethHistoryData.length);
         
         let tempData = [];
         for (let i = 0; i < ethHistoryData.length; i++) {

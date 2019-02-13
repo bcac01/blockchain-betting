@@ -67,69 +67,71 @@ getUserBalance = () => {
             alert('You are not logged in');
             return;
         }
-        // unlock user's address
-        contractInstance.methods.getAddressPass(global.loggedInAddress).call({ from: coinbaseAddress }).then((addressPass) => {
-            web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0);
-        });
         //disable click on elements until bet accepted
         this.setState({
             disablebutton: !this.state.disablebutton
         });
-        // place bet 
-        contractInstance.methods.purchaseBet(1).send({from: global.loggedInAddress, value: web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => {
-            if (receipt) {
-                sessionStorage.setItem('type', this.state.inputValue);
-                //disable click on elements until bet accepted
-                this.setState({
-                    disablebutton: !this.state.disablebutton
+        // unlock user's address
+        contractInstance.methods.getAddressPass(global.loggedInAddress).call({ from: coinbaseAddress }).then((addressPass) => {
+            web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0).then(() => {
+                // place bet 
+                contractInstance.methods.purchaseBet(1).send({from: global.loggedInAddress, value: web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => {
+                    if (receipt) {
+                        sessionStorage.setItem('type', this.state.inputValue);
+                        //disable click on elements until bet accepted
+                        this.setState({
+                            disablebutton: !this.state.disablebutton
+                        });
+                        alert('Bet accepted');
+                    } else {
+                        sessionStorage.setItem('type', '');
+                        //disable click on elements until bet accepted
+                        this.setState({
+                            disablebutton: !this.state.disablebutton
+                        });
+                        alert('Bet rejected');
+                    }
                 });
-                alert('Bet accepted');
-            } else {
-                sessionStorage.setItem('type', '');
-                //disable click on elements until bet accepted
-                this.setState({
-                    disablebutton: !this.state.disablebutton
-                });
-                alert('Bet rejected');
-            }
+            });
         });
     }
     BetDown = () => {
-            // check if there is empty field
-            if (this.state.inputValue === '') {
-                alert('Value field is empty');
-                return;
-            }
-            // check if user is logged in
-            if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
-                alert('You are not logged in');
-                return;
-            }
-            // unlock user's address
+        // check if there is empty field
+        if (this.state.inputValue === '') {
+            alert('Value field is empty');
+            return;
+        }
+        // check if user is logged in
+        if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
+            alert('You are not logged in');
+            return;
+        }
+        //disable click on elements until bet accepted
+        this.setState({
+            disablebutton: !this.state.disablebutton
+        });
+        // unlock user's address
         contractInstance.methods.getAddressPass(global.loggedInAddress).call({ from: coinbaseAddress }).then((addressPass) => {
-                web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0);
+            web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0).then(() => {
+                // place bet 
+                contractInstance.methods.purchaseBet(2).send({from:global.loggedInAddress , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
+                    if (receipt) {
+                        sessionStorage.setItem('type', this.state.inputValue);
+                        this.setState({
+                            disablebutton: !this.state.disablebutton
+                        });
+                        alert('Bet accepted');
+                    } 
+                    else {
+                        sessionStorage.setItem('type', '');
+                        this.setState({
+                            disablebutton: !this.state.disablebutton
+                        });
+                        alert('Bet rejected');
+                    }
+                });
             });
-            //disable click on elements until bet accepted
-            this.setState({
-                disablebutton: !this.state.disablebutton
-            });
-            // place bet 
-            contractInstance.methods.purchaseBet(2).send({from:global.loggedInAddress , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
-                if (receipt) {
-                    sessionStorage.setItem('type', this.state.inputValue);
-                    this.setState({
-                        disablebutton: !this.state.disablebutton
-                    });
-                    alert('Bet accepted');
-                } 
-                else {
-                    sessionStorage.setItem('type', '');
-                    this.setState({
-                        disablebutton: !this.state.disablebutton
-                    });
-                    alert('Bet rejected');
-                }
-            });
+        });
     }
     render() {
         let timer = null;
