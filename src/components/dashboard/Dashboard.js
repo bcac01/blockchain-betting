@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import nodeUrl from '../../eth-node-config.json';
+import ethData from '../../update_service/ethData.json';
+import moment from 'moment';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
 
@@ -66,6 +68,11 @@ class Dashboard extends Component {
             alert('You are not logged in');
             return;
         }
+        // check if time is right
+        if (moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date())) < 0) {
+            alert("You\'ve missed your chance, time's up :(");
+            return;
+        }
         //disable click on elements until bet accepted
         this.setState({
             disablebutton: !this.state.disablebutton
@@ -103,6 +110,11 @@ class Dashboard extends Component {
         // check if user is logged in
         if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
             alert('You are not logged in');
+            return;
+        }
+        // check if time is right
+        if (moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date())) < 0) {
+            alert("You\'ve missed your chance, time's up :(");
             return;
         }
         //disable click on elements until bet accepted
