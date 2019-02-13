@@ -42,12 +42,6 @@ web3.eth.getBalance(contractAddress, function (err, balance) {
 });
 
 /**
- * Create contract instance
- */
-const contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
-console.log(contractInstance);
-
-/**
  * List all accounts with their balance
  */
 // web3.eth.getAccounts().then(result => {
