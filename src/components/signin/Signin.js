@@ -27,7 +27,8 @@ class Signin extends Component {
         this.state = 
         {     
             inputUsername: '',
-            inputPassword: ''
+            inputPassword: '',
+            disablebutton: false,
         };
       }
 
@@ -58,15 +59,25 @@ class Signin extends Component {
             alert('Username or password field is empty');
             return;
         }
+        //disable click on elements until sign in return value
+        this.setState({
+            disablebutton: !this.state.disablebutton
+        });
         // log in user 
         contractInstance.methods.logIn(this.state.inputUsername, this.state.inputPassword).call().then(receipt => {
             if (receipt) {
                 sessionStorage.setItem('username', this.state.inputUsername);
                 sessionStorage.setItem('password', this.state.inputPassword);
+                this.setState({
+                    disablebutton: !this.state.disablebutton
+                });
                 this.props.view();
             } else {
                 sessionStorage.setItem('username', '');
                 sessionStorage.setItem('password', '');
+                this.setState({
+                    disablebutton: !this.state.disablebutton
+                });
                 alert('Wrong username or password');
             }
         });
@@ -91,7 +102,7 @@ class Signin extends Component {
                  <div>
                   <p className="passwordsi-help">Please enter your password.</p>
                 </div>
-                <button type="submit" onClick={this.signIn}>Sign in</button>
+                <button disabled={this.state.disablebutton} type="submit" onClick={this.signIn}>Sign in</button>
                 
             </div>
         );
