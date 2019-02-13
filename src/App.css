@@ -228,3 +228,14 @@ button[type="submit"]:hover{
   float: none;
   margin: 0 auto;
 }
+
+input.error {
+  border: 1px solid #8B0000;
+}
+
+.errorMessage {
+  font:13px Open Sans;
+  color: red;
+  text-shadow:#000 0px 1px 5px;
+  margin-bottom:30px;
+}

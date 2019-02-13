@@ -33,7 +33,12 @@ class Dashboard extends Component {
     this.state = {
         inputValue: '',
         disablebutton: false,
-        showTimer: true
+        showTimer: true,
+        betAccepted: null,
+        placedBet: '',
+        formErrors: {
+            inputValue: ""
+        }
     }
   }
    /**
@@ -51,17 +56,33 @@ getUserBalance = () => {
 } 
     // update value state
     updateValue = (e) => {
-        this.setState({
-            inputValue: e.target.value
-        });
+
+        e.preventDefault();
+
+        const { value } = e.target;
+        let formErrors = { ...this.state.formErrors };
+    
+        formErrors.inputValue = value.length === 0 ? "Please enter a bet value" : "";
+    
+        // TODO : remove logging
+        this.setState({ formErrors, inputValue: value }, () => console.log(this.state));
     }
 
-    BetUp = () => {
-        // check if there is empty field
+handleBet = (e) => {
+        
+        //do not proceed if the field is empty, set inline message
+        let formErrors = { ...this.state.formErrors };
         if (this.state.inputValue === '') {
-            alert('Value field is empty');
+            formErrors.inputValue ="Please enter a bet value";
+            this.setState({ formErrors });
             return;
         }
+
+        // check which button is pressed and save state
+        const { name } = e.target;
+        const placedBetNumber = name === "bet up" ? 1 : 2;
+        this.setState({ placedBet : name });
+       
         // check if user is logged in
         if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
             alert('You are not logged in');
@@ -75,80 +96,77 @@ getUserBalance = () => {
         this.setState({
             disablebutton: !this.state.disablebutton
         });
-        // place bet 
-        contractInstance.methods.purchaseBet(1).send({from: global.loggedInAddress, value: web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => {
+
+        // place bet depending on chosen value
+        contractInstance.methods.purchaseBet(placedBetNumber).send({from:global.loggedInAddress , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
             if (receipt) {
                 sessionStorage.setItem('type', this.state.inputValue);
-                //disable click on elements until bet accepted
                 this.setState({
-                    disablebutton: !this.state.disablebutton
+                    disablebutton: !this.state.disablebutton,
+                    betAccepted: true
                 });
-                alert('Bet accepted');
-            } else {
+            } 
+            else {
                 sessionStorage.setItem('type', '');
-                //disable click on elements until bet accepted
                 this.setState({
-                    disablebutton: !this.state.disablebutton
+                    disablebutton: !this.state.disablebutton,
+                    betAccepted: false
                 });
-                alert('Bet rejected');
             }
         });
     }
-    BetDown = () => {
-            // check if there is empty field
-            if (this.state.inputValue === '') {
-                alert('Value field is empty');
-                return;
-            }
-            // check if user is logged in
-            if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
-                alert('You are not logged in');
-                return;
-            }
-            // unlock user's address
-        contractInstance.methods.getAddressPass(global.loggedInAddress).call({ from: coinbaseAddress }).then((addressPass) => {
-                web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0);
-            });
-            //disable click on elements until bet accepted
-            this.setState({
-                disablebutton: !this.state.disablebutton
-            });
-            // place bet 
-            contractInstance.methods.purchaseBet(2).send({from:global.loggedInAddress , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
-                if (receipt) {
-                    sessionStorage.setItem('type', this.state.inputValue);
-                    this.setState({
-                        disablebutton: !this.state.disablebutton
-                    });
-                    alert('Bet accepted');
-                } 
-                else {
-                    sessionStorage.setItem('type', '');
-                    this.setState({
-                        disablebutton: !this.state.disablebutton
-                    });
-                    alert('Bet rejected');
-                }
-            });
-    }
+
     render() {
+        const { formErrors } = this.state;
         let timer = null;
         if(this.state.showTimer) {
           timer = (<Timer />);
         }
+        console.log(this.state.betAccepted);
         return (
             <div className="dashboard-wrapper">
-                <div className="row">
-                    <div className="col-sm-6">
-                    <input onChange={this.updateValue} type="text" placeholder="Bet value (ETH)"/>   
+            <div className="row">
+                <div className="col">
+                {
+                    this.state.betAccepted ?
+                    <div className="alert alert-success alert-dismissible">
+                    <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        Thank you for your bet.
+                    </div> 
+                    :
+                    this.state.betAccepted != null ?
+                    <div className="alert alert-danger alert-dismissible">
+                    <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                        Your bet was rejected.
                     </div>
-                    <div className="col-sm-3">
-                        <button disabled={this.state.disablebutton} className="betup" onClick={this.BetUp}>Bet up</button>
-                    </div>
-                    <div className="col-sm-3">
-                        <button disabled={this.state.disablebutton} className="betdown" onClick={this.BetDown}>Bet down</button>
+                    : null
+                }
                     </div>
                 </div>
+                {
+                    !this.state.betAccepted ?
+                <div className="row">
+                    <div className="col-sm-6">
+                    <input onChange={this.updateValue} className={formErrors.inputValue.length > 0 ? "error" : null} type="text" placeholder="Bet value (ETH)"/>   
+                    {formErrors.inputValue.length > 0 && (
+                        <p className="errorMessage">{formErrors.inputValue}</p>
+                        )}
+                    </div>
+                    <div className="col-sm-3">
+                        <button disabled={this.state.disablebutton} className="betup" name="bet up" onClick={this.handleBet}>Bet up</button>
+                    </div>
+                    <div className="col-sm-3">
+                        <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
+                    </div>
+                </div>
+                : 
+                <div className="row">
+                    <div className="col-sm-6 column-in-center">
+                        <h2>Bet placed on: {this.state.placedBet}</h2>
+                        <h2>Stake: {this.state.inputValue} ETH</h2>
+                    </div>
+                </div>
+                }
                 {
                     this.state.disablebutton?
                     <div className="loading-wrapper">
