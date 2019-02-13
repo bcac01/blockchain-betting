@@ -14,20 +14,29 @@ class Timer extends Component {
     }
 
     componentDidMount() {
+        /**
+         * Set remaining time to 0 in last 10 minutes of the round
+         */
+        let fixedRemainingTime = 0;
+        if (moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date())) > 0)
+            fixedRemainingTime = moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date()));
+        
         this.setState({
             timeStart: moment(new Date(ethData.roundTime)).format('DD/MMM/YYYY HH:mm'),
             timeEnd: moment(new Date(ethData.roundTime)).add(28, 'minutes').format('DD/MMM/YYYY HH:mm'),
-            timeRemaining: moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date()))
+            timeRemaining: fixedRemainingTime
         });
 
         /**
          * Recalculate and update times every second
          */
         setInterval(() => {
+            if (moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date())) > 0)
+                fixedRemainingTime = moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date()));
             this.setState({
                 timeStart: moment(new Date(ethData.roundTime)).format('DD/MMM/YYYY HH:mm'),
                 timeEnd: moment(new Date(ethData.roundTime)).add(28, 'minutes').format('DD/MMM/YYYY HH:mm'),
-                timeRemaining: moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date()))
+                timeRemaining: fixedRemainingTime
             });
         }, 1000);
     }
