@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
 import nodeUrl from '../../eth-node-config.json';
+import ethData from '../../update_service/ethData.json';
+import moment from 'moment';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
-import Timer from '../timer/Timer.js';
+
 /**
  * Create web3 instance
  */
@@ -28,35 +30,34 @@ web3.eth.getCoinbase().then(result => {
 
 
 class Dashboard extends Component {
-  constructor(dashboardProps) {
-    super(dashboardProps)  
-    this.state = {
-        inputValue: '',
-        disablebutton: false,
-        showTimer: true,
-        betAccepted: null,
-        placedBet: '',
-        formErrors: {
-            inputValue: ""
+    constructor(dashboardProps) {
+        super(dashboardProps)  
+        this.state = {
+            inputValue: '',
+            disablebutton: false,
+            showTimer: true,
+            betAccepted: null,
+            placedBet: '',
+            formErrors: {
+                inputValue: ""
+            }
         }
     }
-  }
-   /**
- * Get user balance
- */
-getUserBalance = () => {
-    web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
-        if (err) {
-            console.error(err);
-        } 
-        else {
-            console.log('Contract balance: ' + balance);
-        }
-    });
-} 
+    /**
+     * Get user balance
+     */
+    getUserBalance = () => {
+        web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
+            if (err) {
+                console.error(err);
+            } 
+            else {
+                console.log('Contract balance: ' + balance);
+            }
+        });
+    } 
     // update value state
     updateValue = (e) => {
-
         e.preventDefault();
 
         const { value } = e.target;
@@ -68,7 +69,7 @@ getUserBalance = () => {
         this.setState({ formErrors, inputValue: value }, () => console.log(this.state));
     }
 
-handleBet = (e) => {
+    handleBet = (e) => {
         
         //do not proceed if the field is empty, set inline message
         let formErrors = { ...this.state.formErrors };
@@ -82,47 +83,48 @@ handleBet = (e) => {
         const { name } = e.target;
         const placedBetNumber = name === "bet up" ? 1 : 2;
         this.setState({ placedBet : name });
-       
+       console.log("Clicked bet: "+name);
         // check if user is logged in
         if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
             alert('You are not logged in');
             return;
         }
-        // unlock user's address
-        contractInstance.methods.getAddressPass(global.loggedInAddress).call({ from: coinbaseAddress }).then((addressPass) => {
-            web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0);
-        });
+        // check if time is right
+        if (moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date())) < 0) {
+            alert("You've missed your chance, time's up :(");
+            return;
+        }
         //disable click on elements until bet accepted
         this.setState({
             disablebutton: !this.state.disablebutton
         });
-
-        // place bet depending on chosen value
-        contractInstance.methods.purchaseBet(placedBetNumber).send({from:global.loggedInAddress , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
-            if (receipt) {
-                sessionStorage.setItem('type', this.state.inputValue);
-                this.setState({
-                    disablebutton: !this.state.disablebutton,
-                    betAccepted: true
+        // unlock user's address
+        contractInstance.methods.getAddressPass(global.loggedInAddress).call({ from: coinbaseAddress }).then((addressPass) => {
+            web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0).then(() => {
+                // place bet 
+                contractInstance.methods.purchaseBet(placedBetNumber).send({from:global.loggedInAddress , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
+                    if (receipt) {
+                        sessionStorage.setItem('type', this.state.inputValue);
+                        this.setState({
+                            disablebutton: !this.state.disablebutton,
+                            betAccepted: true
+                        });
+                    } 
+                    else {
+                        sessionStorage.setItem('type', '');
+                        this.setState({
+                            disablebutton: !this.state.disablebutton,
+                            betAccepted: false
+                        });
+                    }
                 });
-            } 
-            else {
-                sessionStorage.setItem('type', '');
-                this.setState({
-                    disablebutton: !this.state.disablebutton,
-                    betAccepted: false
-                });
-            }
-        });
+            });
+        });                       
     }
 
     render() {
         const { formErrors } = this.state;
-        let timer = null;
-        if(this.state.showTimer) {
-          timer = (<Timer />);
-        }
-        console.log(this.state.betAccepted);
+        console.log("Bet accepted: " + this.state.betAccepted)
         return (
             <div className="dashboard-wrapper">
             <div className="row">
@@ -134,7 +136,7 @@ handleBet = (e) => {
                         Thank you for your bet.
                     </div> 
                     :
-                    this.state.betAccepted != null ?
+                    this.state.betAccepted != null ? //state.betAccepted is null by default, this prevents alert from popping up when we log in and haven't placed bet yet
                     <div className="alert alert-danger alert-dismissible">
                     <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
                         Your bet was rejected.
@@ -183,9 +185,6 @@ handleBet = (e) => {
                     </div>
                 :null
                 }
-            <div className="row">
-                {timer}
-            </div>
             </div>
         );
     }
