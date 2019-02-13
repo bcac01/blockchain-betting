@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import nodeUrl from './eth-node-config.json';
-import ethHistory from './update_service/ethHistory.json';
 import './App.css';
 import Web3 from 'web3';
 import compiledContract from './truffle/build/contracts/BettingApp.json';
@@ -9,9 +8,8 @@ import Signin from './components/signin/Signin';
 import Signout from './components/signout/Signout';
 import Dashboard from './components/dashboard/Dashboard';
 import EthPrice from './components/ethPrice/EthPrice';
+import Graph from './components/graph/Graph';
 import Timer from './components/timer/Timer';
-import moment from 'moment';
-import Chart from 'chart.js';
 
 /**
  * Create web3 instance
@@ -70,6 +68,7 @@ super(props);
       showDashboard: false,
       showEthPrice: false,
       showSignout: false,
+      showGraph: false
     }
   }
 
@@ -81,6 +80,7 @@ super(props);
       showSignup:!this.state.showSignin,
       showDashboard: !this.state.showSignout,
       showEthPrice: !this.state.showSignout,
+      showGraph: !this.state.showGraph
     })
   }
 
@@ -110,6 +110,11 @@ super(props);
       ethPrice = (<EthPrice view={this.hideSignin.bind(this)}/>);
     }
 
+    let graph = null;
+    if (this.state.showGraph) {
+      graph = (<Graph view={this.hideSignin.bind(this)}/>);
+    }
+
     return (
       <div className="App">
         <div className="container">
@@ -125,12 +130,18 @@ super(props);
               </div>
             </div>
             <div className="row">
+              <div className="col">
                 {ethPrice}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col">
+                {graph}
+              </div>
             </div>
             <div className="row">
               <div className="col">
                 {dashboard}
-                <canvas className="history-chart" id="history-chart"></canvas>
               </div>
             </div>
         </div>

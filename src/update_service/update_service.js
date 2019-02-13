@@ -107,7 +107,7 @@ main = () => {
 							betPriceSet = true;
 						}
 						json_ethHistory.price = ethData.currentEthPrice;
-						json_ethHistory.timestamp = currentTime.day + '/' + currentTime.month + '/' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute;
+						json_ethHistory.timestamp = currentTime.month + '/' + currentTime.day + '/' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 						console.log('Betting against ETH price: ' + ethData.betEthPrice + ' | Current ETH price: ' + ethData.currentEthPrice);
 					}
 					callback(null, '');
@@ -155,13 +155,13 @@ main = () => {
 			fs.writeFile("ethData.json", json, function (err) {
 				const logTime = new Date();
 				// console.log(logTime + ': Data saved.');
-				setTimeout(main, 10000);
+				setTimeout(main, 20000);
 				createNewAddress();
 			});
 			// save eth price history
 			fs.readFile('ethHistory.json', function (err, data) {
 				let json = JSON.parse(data);
-				json.splice(0, json.length - 1000);
+				json.splice(0, json.length - 200);
 				json.push(json_ethHistory);
 				const new_json = JSON.stringify(json);
 				fs.writeFile("ethHistory.json", new_json, function (err) {
