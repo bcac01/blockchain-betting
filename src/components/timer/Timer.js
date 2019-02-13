@@ -1,76 +1,37 @@
 import React, { Component } from 'react';
+import ethData from '../../update_service/ethData.json';
+import moment from 'moment';
 
 class Timer extends Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            time: 0,
-            timeStart: 0,
-            timeEnd: 0,
-            timeRemaining: 1200000,
-            visible: false
-        };
-
-        this.startTimer = this.startTimer.bind(this);
-        this.stopTimer = this.stopTimer.bind(this);
-    }
-
-    format(timeRemaining) {
-        let startT = new Date(this.state.time);
-        let finishT = new Date(this.state.timeEnd);
-        let seconds = ((finishT.getTime() - startT.getTime()) / 1000) % 60;
-        let minutes = Math.floor(((finishT.getTime() - startT.getTime()) / 1000) / 60);
-        return minutes + ':' + seconds;
+            timeStart: '',
+            timeEnd: '',
+            timeRemaining: ''
+        }
     }
 
     componentDidMount() {
-        this.startTimer();
-    }
+        const startTime = new Date(ethData.roundTime);
 
-    startTimer = () => {
-        if (sessionStorage.getItem('timeEnd') !== '0' 
-        && sessionStorage.getItem('timeEnd') !== null)
-        {
+        this.setState({
+            timeStart: moment(new Date(ethData.roundTime)).format('DD/MMM/YYYY HH:mm'),
+            timeEnd: moment(new Date(ethData.roundTime)).add(28, 'minutes').format('DD/MMM/YYYY HH:mm'),
+            timeRemaining: moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date()))
+        });
+
+        /**
+         * Recalculate and update times every second
+         */
+        setInterval(() => {
             this.setState({
-                timeStart: sessionStorage.getItem('timeStart'),
-                timeEnd: sessionStorage.getItem('timeEnd'),
-            })
-            this.timer = setInterval(() => this.setState({
-                time: new Date(Date.now()).toLocaleString()
-            }), 1000);
-            this.timer = setInterval(() => {
-                const newCount = this.state.timeRemaining - 1;
-                this.setState(
-                    {timeRemaining: newCount >= 0 ? newCount : 0}
-                );
-            }, 1000);
-        }
-        else
-        {
-            this.setState({
-                timeStart: new Date(Date.now()).toLocaleString(),
-                timeEnd: new Date(Date.now() + 1800000).toLocaleString(),
+                timeStart: moment(new Date(ethData.roundTime)).format('DD/MMM/YYYY HH:mm'),
+                timeEnd: moment(new Date(ethData.roundTime)).add(28, 'minutes').format('DD/MMM/YYYY HH:mm'),
+                timeRemaining: moment(new Date(ethData.roundTime)).add(18, 'minutes').diff(moment(new Date()))
             });
-            this.timer = setInterval(() => this.setState({
-                time: new Date(Date.now()).toLocaleString()
-            }), 1000);
-            sessionStorage.setItem('timeStart',this.state.timeStart);
-            sessionStorage.setItem('timeEnd',this.state.timeEnd);
-            this.timer = setInterval(() => {
-                const newCount = this.state.timeRemaining - 1;
-                this.setState(
-                    {timeRemaining: newCount >= 0 ? newCount : 0}
-                );
-            }, 1000);
-        }
-    }
-
-    stopTimer = () => {
-        //kill contract
-        sessionStorage.removeItem('timeStart');
-        sessionStorage.removeItem('timeEnd');
-        clearInterval(this.timer)
+        }, 1000);
     }
 
     render() {
@@ -78,33 +39,20 @@ class Timer extends Component {
             <div className="timer-wrapper col">
                 <div className="row">
                     <div className="col-sm-6 column-in-center">
-                        <h2>Time remaining: {this.format(this.state.timeRemaining)}</h2>
+                        <h2>Time remaining for bets:</h2>
+                        <h2>{moment(this.state.timeRemaining).format('mm:ss')}</h2>
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col-sm-4">
-                        <h1>Clock: {this.state.time}</h1>
-                    </div>
-                    <div className="col-sm-4">
-                        <h1>Round stared at: {this.state.timeStart}</h1>
-                    </div>
-                    <div className="col-sm-4">
-                        <h1>Round will be finished at: {this.state.timeEnd}</h1>
-                    </div>
-                </div>
-                <br></br>
-                {
-                    this.visible?
-                <div className="row">
                     <div className="col-sm-6">
-                        <button className="betup" onClick={this.startTimer}>Start</button>
+                        <h1>Round stared at:</h1>
+                        <h1>{this.state.timeStart}</h1>
                     </div>
                     <div className="col-sm-6">
-                        <button className="betdown" onClick={this.stopTimer}>Stop</button>
+                        <h1>Round will be finished at:</h1>
+                        <h1>{this.state.timeEnd}</h1>
                     </div>
                 </div>
-                :null
-                }
             </div>
         )
     }

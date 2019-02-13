@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import nodeUrl from '../../eth-node-config.json';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
-import Timer from '../timer/Timer.js';
+
 /**
  * Create web3 instance
  */
@@ -28,27 +28,26 @@ web3.eth.getCoinbase().then(result => {
 
 
 class Dashboard extends Component {
-  constructor(dashboardProps) {
-    super(dashboardProps)  
-    this.state = {
-        inputValue: '',
-        disablebutton: false,
-        showTimer: true
-    }
-  }
-   /**
- * Get user balance
- */
-getUserBalance = () => {
-    web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
-        if (err) {
-            console.error(err);
-        } 
-        else {
-            console.log('Contract balance: ' + balance);
+    constructor(dashboardProps) {
+        super(dashboardProps)  
+        this.state = {
+            inputValue: '',
+            disablebutton: false
         }
-    });
-} 
+    }
+    /**
+     * Get user balance
+     */
+    getUserBalance = () => {
+        web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
+            if (err) {
+                console.error(err);
+            } 
+            else {
+                console.log('Contract balance: ' + balance);
+            }
+        });
+    } 
     // update value state
     updateValue = (e) => {
         this.setState({
@@ -134,10 +133,6 @@ getUserBalance = () => {
         });
     }
     render() {
-        let timer = null;
-        if(this.state.showTimer) {
-          timer = (<Timer />);
-        }
         return (
             <div className="dashboard-wrapper">
                 <div className="row">
@@ -167,9 +162,6 @@ getUserBalance = () => {
                     </div>
                 :null
                 }
-            <div className="row">
-                {timer}
-            </div>
             </div>
         );
     }
