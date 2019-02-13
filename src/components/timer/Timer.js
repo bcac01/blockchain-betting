@@ -14,8 +14,6 @@ class Timer extends Component {
     }
 
     componentDidMount() {
-        const startTime = new Date(ethData.roundTime);
-
         this.setState({
             timeStart: moment(new Date(ethData.roundTime)).format('DD/MMM/YYYY HH:mm'),
             timeEnd: moment(new Date(ethData.roundTime)).add(28, 'minutes').format('DD/MMM/YYYY HH:mm'),
