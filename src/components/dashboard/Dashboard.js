@@ -35,7 +35,6 @@ class Dashboard extends Component {
         this.state = {
             inputValue: '',
             disablebutton: false,
-            showTimer: true,
             betAccepted: null,
             placedBet: '',
             formErrors: {
@@ -83,7 +82,7 @@ class Dashboard extends Component {
         const { name } = e.target;
         const placedBetNumber = name === "bet up" ? 1 : 2;
         this.setState({ placedBet : name });
-       console.log("Clicked bet: "+name);
+       
         // check if user is logged in
         if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
             alert('You are not logged in');
@@ -124,7 +123,7 @@ class Dashboard extends Component {
 
     render() {
         const { formErrors } = this.state;
-        console.log("Bet accepted: " + this.state.betAccepted)
+
         return (
             <div className="dashboard-wrapper">
             <div className="row">
@@ -132,13 +131,13 @@ class Dashboard extends Component {
                 {
                     this.state.betAccepted ?
                     <div className="alert alert-success alert-dismissible">
-                    <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
                         Thank you for your bet.
                     </div> 
                     :
                     this.state.betAccepted != null ? //state.betAccepted is null by default, this prevents alert from popping up when we log in and haven't placed bet yet
                     <div className="alert alert-danger alert-dismissible">
-                    <a href="#" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                    <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
                         Your bet was rejected.
                     </div>
                     : null

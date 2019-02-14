@@ -42,12 +42,6 @@ web3.eth.getBalance(contractAddress, function (err, balance) {
 });
 
 /**
- * Create contract instance
- */
-const contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
-console.log(contractInstance);
-
-/**
  * List all accounts with their balance
  */
 // web3.eth.getAccounts().then(result => {
@@ -61,17 +55,17 @@ console.log(contractInstance);
 class App extends Component {
 
   constructor(props){
-super(props);
+    super(props);
     this.state = {
       showSignup: true,
       showSignin: true,
       showDashboard: false,
       showEthPrice: false,
       showSignout: false,
-      showGraph: false
+      showGraph: false,
+      showTimer: false
     }
   }
-
 
   hideSignin() {
     this.setState({
@@ -80,7 +74,8 @@ super(props);
       showSignup:!this.state.showSignin,
       showDashboard: !this.state.showSignout,
       showEthPrice: !this.state.showSignout,
-      showGraph: !this.state.showGraph
+      showGraph: !this.state.showGraph,
+      showTimer: !this.state.showTimer
     })
   }
 
@@ -115,6 +110,11 @@ super(props);
       graph = (<Graph view={this.hideSignin.bind(this)}/>);
     }
 
+    let timer = null;
+    if(this.state.showTimer) {
+      timer = (<Timer />);
+    }
+
     return (
       <div className="App">
         <div className="container">
@@ -142,6 +142,11 @@ super(props);
             <div className="row">
               <div className="col">
                 {dashboard}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col">
+                {timer}
               </div>
             </div>
         </div>
