@@ -110,17 +110,11 @@ main = () => {
 					if (typeof data !== 'undefined') {
 						ethData.currentEthPrice = parseFloat(data.result.Last.toFixed(2));
 						if ((currentTime.minute == 1 ||
-							currentTime.minute == 6 ||
 							currentTime.minute == 11 ||
-							currentTime.minute == 16 ||
 							currentTime.minute == 21 ||
-							currentTime.minute == 26 ||
 							currentTime.minute == 31 ||
-							currentTime.minute == 36 ||
 							currentTime.minute == 41 ||
-							currentTime.minute == 46 ||
-							currentTime.minute == 51 ||
-							currentTime.minute == 56) &&
+							currentTime.minute == 51) &&
 							!betPriceSet) {
 							ethData.betEthPrice = parseFloat(data.result.Last.toFixed(2));
 							ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
@@ -142,17 +136,11 @@ main = () => {
 		 */
 		distributeRewards = (callback) => {
 			if ((currentTime.minute == 0 ||
-				currentTime.minute == 5 ||
 				currentTime.minute == 10 ||
-				currentTime.minute == 15 ||
 				currentTime.minute == 20 ||
-				currentTime.minute == 25 ||
 				currentTime.minute == 30 ||
-				currentTime.minute == 35 ||
 				currentTime.minute == 40 ||
-				currentTime.minute == 45 ||
-				currentTime.minute == 50 ||
-				currentTime.minute == 55) &&
+				currentTime.minute == 50) &&
 				lastPayoutTime != currentTime.hour + ':' + currentTime.minute) {
 				let winningBet = 0;
 				if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) > 0) {

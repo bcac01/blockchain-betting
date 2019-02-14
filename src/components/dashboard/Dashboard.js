@@ -89,7 +89,7 @@ class Dashboard extends Component {
             return;
         }
         // check if time is right
-        if (moment(new Date(ethData.roundTime)).add(3, 'minutes').diff(moment(new Date())) < 0) {
+        if (moment(new Date(ethData.roundTime)).add(8, 'minutes').diff(moment(new Date())) < 0) {
             alert("You've missed your chance, time's up :(");
             return;
         }
