@@ -16,12 +16,18 @@ class Graph extends React.Component {
             this.setState({
                 tempData: []
             });
+            let minPrice = 10000;
+            let maxPrice = 0;
             for (let i = 0; i < response.data.length; i++) {
                 let dataRow = response.data[i];
                 let chartData = {};
                 chartData.x = moment(new Date(dataRow.timestamp)).format();
                 chartData.y = parseFloat(dataRow.price);
                 this.state.tempData.push(chartData);
+                if (parseFloat(dataRow.price) < minPrice)
+                    minPrice = parseFloat(dataRow.price);
+                if (parseFloat(dataRow.price) > maxPrice)
+                    maxPrice = parseFloat(dataRow.price);
             }
             let chart_data = {
                 type: 'line',
@@ -52,6 +58,10 @@ class Graph extends React.Component {
                         }],
                         yAxes: [{
                             display: true,
+                            ticks: {
+                                suggestedMin: minPrice - 0.1,
+                                suggestedMax: maxPrice + 0.1
+                            },
                             scaleLabel: {
                                 display: true
                             }
@@ -76,17 +86,25 @@ class Graph extends React.Component {
             this.setState({
                 tempData: []
             });
+            let minPrice = 10000;
+            let maxPrice = 0;
             for (let i = 0; i < response.data.length; i++) {
                 let dataRow = response.data[i];
                 let chartData = {};
                 chartData.x = moment(new Date(dataRow.timestamp)).format();
                 chartData.y = parseFloat(dataRow.price);
                 this.state.tempData.push(chartData);
+                if (parseFloat(dataRow.price) < minPrice)
+                    minPrice = parseFloat(dataRow.price);
+                if (parseFloat(dataRow.price) > maxPrice)
+                    maxPrice = parseFloat(dataRow.price);
             }
 
             chart.data.datasets.forEach((dataset) => {
                 dataset.data = this.state.tempData;
             });
+            chart.options.scales.yAxes[0].ticks.suggestedMin = minPrice - 0.1;
+            chart.options.scales.yAxes[0].ticks.suggestedMax = maxPrice + 0.1;
             chart.update();
         });
     }
