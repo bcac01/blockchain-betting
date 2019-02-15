@@ -29,6 +29,8 @@ class Signin extends Component {
             inputUsername: '',
             inputPassword: '',
             disablebutton: false,
+            dangerAlert: false,
+            warningAlert: false,
         };
       }
 
@@ -56,7 +58,16 @@ class Signin extends Component {
     signIn = () => {
         // check if there is empty field
         if (this.state.inputUsername === '' || this.state.inputPassword === '') {
-            alert('Username or password field is empty');
+            if (this.state.dangerAlert === false)
+            this.setState({
+                dangerAlert: !this.state.dangerAlert
+            });
+            if (this.state.warningAlert === true)
+            {
+                this.setState({
+                    warningAlert: !this.state.warningAlert
+                })
+            }
             return;
         }
         //disable click on elements until sign in return value
@@ -78,7 +89,16 @@ class Signin extends Component {
                 this.setState({
                     disablebutton: !this.state.disablebutton
                 });
-                alert('Wrong username or password');
+                if (this.state.warningAlert === false)
+                this.setState({
+                    warningAlert: !this.state.warningAlert
+                });
+                if (this.state.dangerAlert === true)
+                {
+                    this.setState({
+                        dangerAlert: !this.state.dangerAlert
+                    })
+                }
             }
         });
         // get logged in user's address
@@ -103,7 +123,24 @@ class Signin extends Component {
                   <p className="passwordsi-help">Please enter your password.</p>
                 </div>
                 <button disabled={this.state.disablebutton} type="submit" onClick={this.signIn}>Sign in</button>
-                
+                {
+                    this.state.dangerAlert?
+                        <div className="row">
+                            <div className="alert alert-danger col">
+                                <strong>Warning!</strong> Username or password field is empty.
+                            </div>
+                        </div>
+                    :null
+                }
+                {
+                    this.state.warningAlert?
+                        <div className="row">
+                            <div className="alert alert-warning col">
+                                <strong>Warning!</strong> Wrong username or password.
+                            </div>
+                        </div>
+                    :null
+                }
             </div>
         );
     }

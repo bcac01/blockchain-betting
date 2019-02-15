@@ -33,7 +33,7 @@ class Signup extends Component {
         inputPassword: '',
         disablebutton: false,
         successAlert: false,
-        successInfo: false,
+        infoAlert: false,
     };
 
     // update username state
@@ -96,12 +96,12 @@ class Signup extends Component {
                         this.clearFields();
                     } else {
                         this.setState({
-                            successInfo: !this.state.successInfo
+                            infoAlert: !this.state.infoAlert
                         });
                         // create new account that will be available for new users 
                         this.createNewAccount();
                         this.setState({
-                            successInfo: !this.state.successInfo
+                            infoAlert: !this.state.infoAlert
                         });
                         this.setState({
                             successAlert: !this.state.successAlert
@@ -157,8 +157,8 @@ class Signup extends Component {
                 {
                     this.state.successAlert?
                         <div className="row">
-                            <div className="alert alert-success">
-                                <strong>Success!</strong> This alert box could indicate a successful or positive action.
+                            <div className="alert alert-success col">
+                                <strong>Wellcome!</strong> Account successfully created.
                             </div>
                         </div>
                     :null
@@ -166,7 +166,7 @@ class Signup extends Component {
                 {
                     this.state.successInfo?
                         <div className="row">
-                            <div className="alert alert-info">
+                            <div className="alert alert-info col">
                                 <strong>Info!</strong> Please wait until new address is genereted
                             </div>
                         </div>

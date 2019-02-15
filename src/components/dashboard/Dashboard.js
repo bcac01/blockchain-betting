@@ -42,19 +42,7 @@ class Dashboard extends Component {
             }
         }
     }
-    /**
-     * Get user balance
-     */
-    getUserBalance = () => {
-        web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
-            if (err) {
-                console.error(err);
-            } 
-            else {
-                console.log('Contract balance: ' + balance);
-            }
-        });
-    } 
+    
     // update value state
     updateValue = (e) => {
         e.preventDefault();
