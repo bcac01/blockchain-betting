@@ -105,7 +105,6 @@ contract BettingApp {
     function purchaseBet(uint8 _type) public payable {
         require(msg.sender != contractOwner);
         require(_type == 1 || _type == 2);
-        require(msg.value <= msg.sender.balance);
         
         Bet memory newBet;
         newBet.playerAddress = msg.sender;
@@ -123,28 +122,44 @@ contract BettingApp {
     }
     
     function payWinnigBets(uint8 _winningType) public {
-        require(_winningType == 1 || _winningType == 2);
+        require(_winningType == 0 || _winningType == 1 || _winningType == 2);
         if (Bets.length > 0) {
             uint reward;
             uint rewardCoefficient;
             uint ethForHouse;
-            
-            if (_winningType == 1) {
-                ethForHouse = totalBetUpAmount * 10 / 100;
-                contractOwner.transfer(ethForHouse);
-                totalBetAmount -= ethForHouse;
-                rewardCoefficient = totalBetAmount * 10000 / totalBetDownAmount;
+            bool winningBets = false;
+
+            // if there was no change in price, return the funds to all users
+            if (_winningType == 0) {
+                for (uint i = 0; i < Bets.length; i++) {
+                    Bets[i].playerAddress.transfer(Bets[i].amount);
+                }
             } else {
-                ethForHouse = totalBetDownAmount * 10 / 100;
-                contractOwner.transfer(ethForHouse);
-                totalBetAmount -= ethForHouse;
-                rewardCoefficient = totalBetAmount * 10000 / totalBetUpAmount;
-            }
-    
-            for (uint i = 0; i < Bets.length; i++) {
-                if(Bets[i].betType == _winningType) {
-                    reward = Bets[i].amount * rewardCoefficient / 10000;
-                    Bets[i].playerAddress.transfer(reward);
+                // check if there was winning bets, get 10% for the house and calculate reward coefficient
+                if (_winningType == 1 && totalBetDownAmount > 0) {
+                    winningBets = true;
+                    ethForHouse = totalBetUpAmount * 10 / 100;
+                    contractOwner.transfer(ethForHouse);
+                    totalBetAmount -= ethForHouse;
+                    rewardCoefficient = totalBetAmount * 10000 / totalBetDownAmount;
+                } else if (_winningType == 2 && totalBetUpAmount > 0) {
+                    winningBets = true;
+                    ethForHouse = totalBetDownAmount * 10 / 100;
+                    contractOwner.transfer(ethForHouse);
+                    totalBetAmount -= ethForHouse;
+                    rewardCoefficient = totalBetAmount * 10000 / totalBetUpAmount;
+                }
+                
+                // transfer funds to users that won if there were any
+                if (winningBets) {
+                    for (uint i = 0; i < Bets.length; i++) {
+                        if(Bets[i].betType == _winningType) {
+                            reward = Bets[i].amount * rewardCoefficient / 10000;
+                            Bets[i].playerAddress.transfer(reward);
+                        }
+                    }
+                } else {
+                    contractOwner.transfer(totalBetAmount);
                 }
             }
             

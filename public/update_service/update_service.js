@@ -131,15 +131,17 @@ getEthPrice = () => {
  */
 distributeRewards = () => {
 	lastPayoutTime = currentTime.hour + ':' + currentTime.minute;
-	let winningBet = 0;
-	if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) > 0) {
+	let winningBet;
+	if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) == 0) {
+		winningBet = 0;
+	} else if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) < 0) {
 		winningBet = 1;
 	} else {
 		winningBet = 2;
 	}
 	contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
-		console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
 		betPriceSet = false;
+		console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
 	});
 }
 
