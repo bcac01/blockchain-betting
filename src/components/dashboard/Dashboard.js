@@ -73,17 +73,23 @@ class Dashboard extends Component {
         this.setState({ formErrors, inputValue: value }, () => console.log(this.state));
     }
 
+    /**
+     * Reset state if bet was invalid
+     */
+    resetBet = () => {
+        sessionStorage.setItem('type', '');
+        this.setState({
+            disablebutton: !this.state.disablebutton,
+            betAccepted: false
+        });
+    }
+
     handleBet = (e) => {
 
         //disable click on elements until bet accepted
         this.setState({
             disablebutton: !this.state.disablebutton
         });
-
-        // check which button is pressed and save state
-        const { name } = e.target;
-        const placedBetNumber = name === "bet up" ? 1 : 2;
-        this.setState({ placedBet : name });
 
         //do not proceed if the field is empty, set inline message
         let formErrors = { ...this.state.formErrors };
@@ -92,37 +98,49 @@ class Dashboard extends Component {
             this.setState({ formErrors });
             return;
         } else {
+            // check which button is pressed and save state
+            const { name } = e.target;
+            const placedBetNumber = name === "bet up" ? 1 : 2;
+            this.setState({ placedBet: name });
+
             // check if user is logged in
             if ((sessionStorage.getItem('address') === '0x0000000000000000000000000000000000000000') || (sessionStorage.getItem('address') === '') || (sessionStorage.getItem('address') === null)) {
                 alert('You are not logged in');
+                this.resetBet();
                 return;
             } else {
                 // check if time is right
                 axios.get('/update_service/ethData.json').then(response => {
                     if (moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())) < 0) {
                         alert("You've missed your chance, time's up :(");
+                        this.resetBet();
                         return;
                     } else {
-                        // unlock user's address
-                        contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
-                            web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 0).then(() => {
-                                // place bet 
-                                contractInstance.methods.purchaseBet(placedBetNumber).send({from:sessionStorage.getItem('address') , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
-                                    if (receipt) {
-                                        sessionStorage.setItem('type', this.state.inputValue);
-                                        this.setState({
-                                            disablebutton: !this.state.disablebutton,
-                                            betAccepted: true
+                        // check if user have enough funds
+                        web3.eth.getBalance(sessionStorage.getItem('address')).then(balance => {
+                            if (balance < this.state.inputValue) {
+                                alert('You don\'t have enough funds');
+                                this.resetBet();
+                                return;
+                            } else {
+                                // unlock user's address
+                                contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
+                                    web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 0).then(() => {
+                                        // place bet 
+                                        contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000 }).then(receipt => {
+                                            if (receipt) {
+                                                sessionStorage.setItem('type', this.state.inputValue);
+                                                this.setState({
+                                                    disablebutton: !this.state.disablebutton,
+                                                    betAccepted: true
+                                                });
+                                            } else {
+                                                this.resetBet();
+                                            }
                                         });
-                                    } else {
-                                        sessionStorage.setItem('type', '');
-                                        this.setState({
-                                            disablebutton: !this.state.disablebutton,
-                                            betAccepted: false
-                                        });
-                                    }
+                                    });
                                 });
-                            });
+                            }
                         });
                     }
                 });
