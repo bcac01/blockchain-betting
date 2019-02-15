@@ -160,6 +160,7 @@ updateTime = () => {
 
 	if (currentTime.second == 0 || currentTime.second == 30) {
 		getEthPrice();
+		createNewAddress();
 	}
 
 	if ((currentTime.minute == 0 ||
@@ -170,7 +171,6 @@ updateTime = () => {
 		currentTime.minute == 50) &&
 		lastPayoutTime != currentTime.hour + ':' + currentTime.minute) {
 		distributeRewards();
-		createNewAddress();
 	}
 }
 setTimeout(updateTime, 1000);
