@@ -17,7 +17,6 @@ const contractAddress = compiledContract.networks['300'].address;
  * Create contract instance
  */
 const contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
-global.loggedInAddress = null;
 
 
 class Signin extends Component {
@@ -67,13 +66,12 @@ class Signin extends Component {
                 // get logged in user's address
                 contractInstance.methods.getUserLoggedInAddress(this.state.inputUsername, this.state.inputPassword).call().then(receipt => {
                     if (receipt) {
-                        global.loggedInAddress = receipt;
+                        sessionStorage.setItem('address', receipt);
                         this.props.view();
                     }
                 })
             } else {
-                sessionStorage.setItem('username', '');
-                sessionStorage.setItem('password', '');
+                sessionStorage.clear();
                 this.setState({
                     disablebutton: !this.state.disablebutton
                 });

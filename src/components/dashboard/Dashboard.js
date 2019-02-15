@@ -30,6 +30,7 @@ web3.eth.getCoinbase().then(result => {
 
 
 class Dashboard extends Component {
+
     constructor(dashboardProps) {
         super(dashboardProps)  
         this.state = {
@@ -42,19 +43,23 @@ class Dashboard extends Component {
             }
         }
     }
+
+    componentDidMount = () => {
+        this.getUserBalance();
+    }
+
     /**
      * Get user balance
      */
     getUserBalance = () => {
-        web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
-            if (err) {
+        web3.eth.getBalance(sessionStorage.getItem('address'), function (err, balance) {
+            if (err)
                 console.error(err);
-            } 
-            else {
-                console.log('Contract balance: ' + balance);
-            }
+            else
+                console.log('User balance: ' + web3.utils.fromWei(balance, 'ether') + ' eth');
         });
-    } 
+    }
+
     // update value state
     updateValue = (e) => {
         e.preventDefault();
@@ -84,7 +89,7 @@ class Dashboard extends Component {
         this.setState({ placedBet : name });
        
         // check if user is logged in
-        if((global.loggedInAddress === '0x0000000000000000000000000000000000000000') || (global.loggedInAddress === '') || (global.loggedInAddress === null)) {
+        if ((sessionStorage.getItem('address') === '0x0000000000000000000000000000000000000000') || (sessionStorage.getItem('address') === '') || (sessionStorage.getItem('address') === null)) {
             alert('You are not logged in');
             return;
         }
@@ -100,10 +105,10 @@ class Dashboard extends Component {
             disablebutton: !this.state.disablebutton
         });
         // unlock user's address
-        contractInstance.methods.getAddressPass(global.loggedInAddress).call({ from: coinbaseAddress }).then((addressPass) => {
-            web3.eth.personal.unlockAccount(global.loggedInAddress, addressPass, 0).then(() => {
+        contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
+            web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 0).then(() => {
                 // place bet 
-                contractInstance.methods.purchaseBet(placedBetNumber).send({from:global.loggedInAddress , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
+                contractInstance.methods.purchaseBet(placedBetNumber).send({from:sessionStorage.getItem('address') , value:web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000}).then(receipt => { 
                     if (receipt) {
                         sessionStorage.setItem('type', this.state.inputValue);
                         this.setState({
