@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 import nodeUrl from '../../eth-node-config.json';
-import ethData from '../../update_service/ethData.json';
 import moment from 'moment';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
@@ -89,10 +89,12 @@ class Dashboard extends Component {
             return;
         }
         // check if time is right
-        if (moment(new Date(ethData.roundTime)).add(8, 'minutes').diff(moment(new Date())) < 0) {
-            alert("You've missed your chance, time's up :(");
-            return;
-        }
+        axios.get('/update_service/ethData.json').then(response => {
+            if (moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())) < 0) {
+                alert("You've missed your chance, time's up :(");
+                return;
+            }
+        });
         //disable click on elements until bet accepted
         this.setState({
             disablebutton: !this.state.disablebutton

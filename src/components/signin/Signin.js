@@ -45,13 +45,6 @@ class Signin extends Component {
             inputPassword: e.target.value
         });
     }
-    componentDidMount() {
-        if (sessionStorage.getItem('username') !== '' && sessionStorage.getItem('username') !== null){
-            this.state.inputPassword = sessionStorage.getItem('password');
-            this.state.inputUsername = sessionStorage.getItem('username');
-            this.signIn();
-        }
-    }
 
     signIn = () => {
         // check if there is empty field
