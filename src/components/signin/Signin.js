@@ -64,7 +64,13 @@ class Signin extends Component {
                 this.setState({
                     disablebutton: !this.state.disablebutton
                 });
-                this.props.view();
+                // get logged in user's address
+                contractInstance.methods.getUserLoggedInAddress(this.state.inputUsername, this.state.inputPassword).call().then(receipt => {
+                    if (receipt) {
+                        global.loggedInAddress = receipt;
+                        this.props.view();
+                    }
+                })
             } else {
                 sessionStorage.setItem('username', '');
                 sessionStorage.setItem('password', '');
@@ -74,13 +80,6 @@ class Signin extends Component {
                 alert('Wrong username or password');
             }
         });
-        // get logged in user's address
-        contractInstance.methods.getUserLoggedInAddress(this.state.inputUsername, this.state.inputPassword).call()
-        .then(receipt => {
-            if(receipt) {
-                global.loggedInAddress = receipt;
-            }
-        })
     }
     render() {
         return (
