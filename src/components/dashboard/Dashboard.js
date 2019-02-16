@@ -100,7 +100,7 @@ class Dashboard extends Component {
         } else {
             // check which button is pressed and save state
             const { name } = e.target;
-            const placedBetNumber = name === "bet up" ? 1 : 2;
+            const placedBetNumber = name === "bet up" ? 2 : 1;
             this.setState({ placedBet: name });
 
             // check if user is logged in
@@ -125,7 +125,7 @@ class Dashboard extends Component {
                             } else {
                                 // unlock user's address
                                 contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
-                                    web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 0).then(() => {
+                                    web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 120).then(() => {
                                         // place bet 
                                         contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000 }).then(receipt => {
                                             if (receipt) {

@@ -64,7 +64,7 @@ createNewAddress = () => {
 				const pass = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 				web3.eth.personal.newAccount(pass).then(address => {
 					const newAddress = address;
-					web3.eth.personal.unlockAccount(address, pass, 0).then(() => {
+					web3.eth.personal.unlockAccount(address, pass, 120).then(() => {
 						web3.eth.sendTransaction({ from: coinbaseAddress, to: newAddress, value: web3.utils.toWei("5", "ether") }).then(receipt => {
 							console.log('Created new address, gas spent: ' + receipt.gasUsed);
 							contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 }).then(receipt => {
@@ -84,12 +84,12 @@ createNewAddress = () => {
  */
 getEthPrice = () => {
 	request({
-		url: "https://api.bittrex.com/api/v1.1/public/getticker?market=USD-ETH",
+		url: "https://api-pub.bitfinex.com/v2/ticker/tETHUSD",
 		json: true
 	}, function (error, response, data) {
 		if (!error && response.statusCode === 200) {
 			if (typeof data !== 'undefined') {
-				ethData.currentEthPrice = parseFloat(data.result.Last.toFixed(2));
+				ethData.currentEthPrice = parseFloat(data[6].toFixed(2));
 				if ((currentTime.minute == 1 ||
 					currentTime.minute == 11 ||
 					currentTime.minute == 21 ||
@@ -97,7 +97,7 @@ getEthPrice = () => {
 					currentTime.minute == 41 ||
 					currentTime.minute == 51) &&
 					!betPriceSet) {
-					ethData.betEthPrice = parseFloat(data.result.Last.toFixed(2));
+					ethData.betEthPrice = ethData.currentEthPrice;
 					ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 					betPriceSet = true;
 				}
@@ -139,6 +139,7 @@ distributeRewards = () => {
 	} else {
 		winningBet = 2;
 	}
+	console.log('Winning bet: ' + winningBet);
 	contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
 		betPriceSet = false;
 		console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
