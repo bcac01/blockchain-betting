@@ -48,7 +48,9 @@ fs.readFile('ethData.json', function (err, data) {
  */
 fs.writeFile("ethHistory.json", '[]', function (err) {
 	const logTime = new Date();
-	console.log(logTime + ': ETH history data erased.');
+	console.log(logTime);
+	console.log('ETH history data erased.');
+	console.log('------------------------');
 });
 
 /**
@@ -57,7 +59,6 @@ fs.writeFile("ethHistory.json", '[]', function (err) {
 createNewAddress = () => {
 	if (coinbaseAddress != '') {
 		contractInstance.methods.getAvailableAddresses().call().then(receipt => {
-			console.log('Number of available addresses: ' + receipt);
 			if (receipt < 50 && !creatingAddress) {
 				creatingAddress = true;
 				console.log('Not enough addresses in the pool, creating new address.');
@@ -70,6 +71,7 @@ createNewAddress = () => {
 							contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 }).then(receipt => {
 								creatingAddress = false;
 								console.log('New address is now available, gas spent: ' + receipt.gasUsed);
+								console.log('Number of available addresses: ' + receipt);
 							});
 						});
 					});
@@ -100,10 +102,13 @@ getEthPrice = () => {
 					ethData.betEthPrice = ethData.currentEthPrice;
 					ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 					betPriceSet = true;
+					const logTime = new Date();
+					console.log(logTime);
+					console.log('New round started, betting against ETH price: ' + ethData.betEthPrice);
+					console.log('------------------------');
 				}
 				json_ethHistory.price = ethData.currentEthPrice;
 				json_ethHistory.timestamp = currentTime.month + '/' + currentTime.day + '/' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
-				console.log('Betting against ETH price: ' + ethData.betEthPrice + ' | Current ETH price: ' + ethData.currentEthPrice);
 				// save eth price and time data
 				const json = JSON.stringify(ethData);
 				fs.writeFile("ethData.json", json, function (err) {
@@ -113,7 +118,7 @@ getEthPrice = () => {
 				// save eth price history
 				fs.readFile('ethHistory.json', function (err, data) {
 					let json = JSON.parse(data);
-					json.splice(0, json.length - 200);
+					json.splice(0, json.length - 180);
 					json.push(json_ethHistory);
 					const new_json = JSON.stringify(json);
 					fs.writeFile("ethHistory.json", new_json, function (err) {
@@ -139,10 +144,16 @@ distributeRewards = () => {
 	} else {
 		winningBet = 2;
 	}
+	const logTime = new Date();
+	console.log(logTime);
 	console.log('Winning bet: ' + winningBet);
+	console.log('------------------------');
 	contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
 		betPriceSet = false;
+		const logTime = new Date();
+		console.log(logTime);
 		console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
+		console.log('------------------------');
 	});
 }
 

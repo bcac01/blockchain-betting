@@ -37,7 +37,7 @@ web3.eth.getBalance(contractAddress, function (err, balance) {
     console.error(err);
   } else {
     console.log('Contract address: ' + contractAddress);
-    console.log('Contract balance: ' + web3.utils.fromWei(balance, 'ether') + ' ether');
+    console.log('Contract balance: ' + web3.utils.fromWei(balance, 'ether') + ' eth');
   }
 });
 
