@@ -59,6 +59,7 @@ fs.writeFile("ethHistory.json", '[]', function (err) {
 createNewAddress = () => {
 	if (coinbaseAddress != '') {
 		contractInstance.methods.getAvailableAddresses().call().then(receipt => {
+			const availableAddresses = receipt;
 			if (receipt < 50 && !creatingAddress) {
 				creatingAddress = true;
 				console.log('Not enough addresses in the pool, creating new address.');
@@ -71,7 +72,7 @@ createNewAddress = () => {
 							contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 }).then(receipt => {
 								creatingAddress = false;
 								console.log('New address is now available, gas spent: ' + receipt.gasUsed);
-								console.log('Number of available addresses: ' + receipt);
+								console.log('Number of available addresses: ' + availableAddresses);
 							});
 						});
 					});
