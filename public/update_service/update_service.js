@@ -66,15 +66,21 @@ createNewAddress = () => {
 				const pass = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 				web3.eth.personal.newAccount(pass).then(address => {
 					const newAddress = address;
-					web3.eth.personal.unlockAccount(address, pass, 120).then(() => {
-						web3.eth.sendTransaction({ from: coinbaseAddress, to: newAddress, value: web3.utils.toWei("5", "ether") }).then(receipt => {
-							console.log('Created new address, gas spent: ' + receipt.gasUsed);
-							contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 }).then(receipt => {
-								creatingAddress = false;
-								console.log('New address is now available, gas spent: ' + receipt.gasUsed);
-								console.log('Number of available addresses: ' + availableAddresses);
+					web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
+						if (unlocked) {
+							web3.eth.personal.unlockAccount(newAddress, pass, 120).then(unlocked => {
+								if (unlocked) {
+									web3.eth.sendTransaction({ from: coinbaseAddress, to: newAddress, value: web3.utils.toWei("5", "ether") }).then(receipt => {
+										console.log('Created new address, gas spent: ' + receipt.gasUsed);
+										contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 }).then(receipt => {
+											creatingAddress = false;
+											console.log('New address is now available, gas spent: ' + receipt.gasUsed);
+											console.log('Number of available addresses: ' + availableAddresses);
+										});
+									});
+								}
 							});
-						});
+						}
 					});
 				});
 			}
@@ -149,12 +155,16 @@ distributeRewards = () => {
 	console.log(logTime);
 	console.log('Winning bet: ' + winningBet);
 	console.log('------------------------');
-	contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
-		betPriceSet = false;
-		const logTime = new Date();
-		console.log(logTime);
-		console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
-		console.log('------------------------');
+	web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
+		if (unlocked) {
+			contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
+				betPriceSet = false;
+				const logTime = new Date();
+				console.log(logTime);
+				console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
+				console.log('------------------------');
+			});
+		}
 	});
 }
 

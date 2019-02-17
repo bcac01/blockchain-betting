@@ -168,5 +168,10 @@ contract BettingApp {
             totalBetUpAmount = 0;
             totalBetDownAmount = 0;
         }
+        
+        // send remaining eth (if any) from contract to contractOwner
+        if (address(this).balance > 0) {
+            contractOwner.transfer(address(this).balance);
+        }
     }
 }
