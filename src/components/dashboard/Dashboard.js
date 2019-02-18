@@ -134,6 +134,7 @@ class Dashboard extends Component {
                                                     disablebutton: !this.state.disablebutton,
                                                     betAccepted: true
                                                 });
+                                                console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                             } else {
                                                 this.resetBet();
                                             }

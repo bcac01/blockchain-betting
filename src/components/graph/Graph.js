@@ -75,7 +75,7 @@ class Graph extends React.Component {
         });
         this.timer = setInterval(() => {
             this.updateGraph(this.state.chart);
-        }, 30000);
+        }, 12000);
     }
 
     updateGraph = (chart) => {
