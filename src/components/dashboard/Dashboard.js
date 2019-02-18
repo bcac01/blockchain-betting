@@ -43,23 +43,7 @@ class Dashboard extends Component {
             }
         }
     }
-
-    componentDidMount = () => {
-        this.getUserBalance();
-    }
-
-    /**
-     * Get user balance
-     */
-    getUserBalance = () => {
-        web3.eth.getBalance(sessionStorage.getItem('address'), function (err, balance) {
-            if (err)
-                console.error(err);
-            else
-                console.log('User balance: ' + web3.utils.fromWei(balance, 'ether') + ' eth');
-        });
-    }
-
+    
     // update value state
     updateValue = (e) => {
         e.preventDefault();
