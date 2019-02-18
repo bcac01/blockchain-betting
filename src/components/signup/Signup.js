@@ -62,7 +62,7 @@ class Signup extends Component {
         const pass = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
         web3.eth.personal.newAccount(pass).then(address => {
             const newAddress = address;
-            web3.eth.personal.unlockAccount(address, pass, 0).then(() => {
+            web3.eth.personal.unlockAccount(newAddress, pass, 120).then(() => {
                 web3.eth.sendTransaction({ from: coinbaseAddress, to: newAddress, value: web3.utils.toWei("5", "ether") });
                     contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 });
             });

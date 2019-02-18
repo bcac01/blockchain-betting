@@ -1,30 +1,23 @@
 import React, { Component } from 'react';
-import ethData from '../../update_service/ethData.json';
-import Web3 from 'web3';
-import nodeUrl from '../../eth-node-config.json';
+import axios from 'axios';
 
 const web3 = new Web3(nodeUrl.url);
  
 class EthPrice extends Component {
+
     constructor(ethPriceProps) {
         super(ethPriceProps)  
         this.state = {
-            price: ethData.currentEthPrice,
-            betPrice: ethData.betEthPrice,
-            priceDifference: ((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100).toFixed(2),
+            price: 0,
+            betPrice: 0,
+            priceDifference: 0,
             currentBalance: ''
         }
     }
-   
-/**
- * After all the elements of the page is rendered correctly, this method is called by React itself to either fetch the data from An External API or perform some unique operations which need the JSX elements.
- // https://apiv2.bitcoinaverage.com/indices/global/ticker/ETHUSD  // https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD
- */
 
     /**
      * Get user balance
      */
-    
     getUserBalance = () => {
         let bal = '';
         web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
@@ -39,17 +32,21 @@ class EthPrice extends Component {
                 console.log(bal)
         });
     }
-
-    componentDidMount(){        
-        setInterval( () => {
-            this.setState({
-                price: ethData.currentEthPrice,
-                betPrice: ethData.betEthPrice,
-                priceDifference: ((ethData.currentEthPrice / ethData.betEthPrice - 1) 
-                * 100).toFixed(2),
+    componentDidMount(){
+        this.timer = setInterval( () => {
+            axios.get('/update_service/ethData.json').then(response => {
+                this.setState({
+                    price: response.data.currentEthPrice,
+                    betPrice: response.data.betEthPrice,
+                    priceDifference: ((response.data.currentEthPrice / response.data.betEthPrice - 1) * 100).toFixed(2)
+                });
             });
-        }, 10000)
+        }, 1000);
     }
+
+    componentWillUnmount = () => {
+        clearTimeout(this.timer);
+    };
 
     render() {
         return (

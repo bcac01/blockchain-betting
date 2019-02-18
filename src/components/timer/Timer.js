@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import ethData from '../../update_service/ethData.json';
+import axios from 'axios';
 import moment from 'moment';
 
 class Timer extends Component {
@@ -14,32 +14,43 @@ class Timer extends Component {
     }
 
     componentDidMount() {
-        /**
-         * Set remaining time to 0 in last 10 minutes of the round
-         */
+
         let fixedRemainingTime = 0;
-        if (moment(new Date(ethData.roundTime)).add(8, 'minutes').diff(moment(new Date())) > 0)
-            fixedRemainingTime = moment(new Date(ethData.roundTime)).add(8, 'minutes').diff(moment(new Date()));
-        
-        this.setState({
-            timeStart: moment(new Date(ethData.roundTime)).format('DD/MMM/YYYY HH:mm'),
-            timeEnd: moment(new Date(ethData.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm'),
-            timeRemaining: fixedRemainingTime
+        axios.get('/update_service/ethData.json').then(response => {
+
+            /**
+             * Set remaining time to 0 in last 10 minutes of the round
+             */
+            if (moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())) > 0)
+                fixedRemainingTime = moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date()));
+
+            this.setState({
+                timeStart: moment(new Date(response.data.roundTime)).format('DD/MMM/YYYY HH:mm'),
+                timeEnd: moment(new Date(response.data.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm'),
+                timeRemaining: fixedRemainingTime
+            });
+            
         });
 
         /**
          * Recalculate and update times every second
          */
-        setInterval(() => {
-            if (moment(new Date(ethData.roundTime)).add(8, 'minutes').diff(moment(new Date())) > 0)
-                fixedRemainingTime = moment(new Date(ethData.roundTime)).add(8, 'minutes').diff(moment(new Date()));
-            this.setState({
-                timeStart: moment(new Date(ethData.roundTime)).format('DD/MMM/YYYY HH:mm'),
-                timeEnd: moment(new Date(ethData.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm'),
-                timeRemaining: fixedRemainingTime
+        this.timer = setInterval(() => {
+            axios.get('/update_service/ethData.json').then(response => {
+                if (moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())) > 0)
+                    fixedRemainingTime = moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date()));
+                this.setState({
+                    timeStart: moment(new Date(response.data.roundTime)).format('DD/MMM/YYYY HH:mm'),
+                    timeEnd: moment(new Date(response.data.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm'),
+                    timeRemaining: fixedRemainingTime
+                });
             });
         }, 1000);
     }
+
+    componentWillUnmount = () => {
+        clearTimeout(this.timer);
+    };
 
     render() {
         return(

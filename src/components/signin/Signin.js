@@ -17,7 +17,6 @@ const contractAddress = compiledContract.networks['300'].address;
  * Create contract instance
  */
 const contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
-global.loggedInAddress = null;
 
 
 class Signin extends Component {
@@ -47,13 +46,6 @@ class Signin extends Component {
             inputPassword: e.target.value
         });
     }
-    componentDidMount() {
-        if (sessionStorage.getItem('username') !== '' && sessionStorage.getItem('username') !== null){
-            this.state.inputPassword = sessionStorage.getItem('password');
-            this.state.inputUsername = sessionStorage.getItem('username');
-            this.signIn();
-        }
-    }
 
     signIn = () => {
         // check if there is empty field
@@ -82,10 +74,15 @@ class Signin extends Component {
                 this.setState({
                     disablebutton: !this.state.disablebutton
                 });
-                this.props.view();
+                // get logged in user's address
+                contractInstance.methods.getUserLoggedInAddress(this.state.inputUsername, this.state.inputPassword).call().then(receipt => {
+                    if (receipt) {
+                        sessionStorage.setItem('address', receipt);
+                        this.props.view();
+                    }
+                })
             } else {
-                sessionStorage.setItem('username', '');
-                sessionStorage.setItem('password', '');
+                sessionStorage.clear();
                 this.setState({
                     disablebutton: !this.state.disablebutton
                 });
@@ -101,13 +98,6 @@ class Signin extends Component {
                 }
             }
         });
-        // get logged in user's address
-        contractInstance.methods.getUserLoggedInAddress(this.state.inputUsername, this.state.inputPassword).call()
-        .then(receipt => {
-            if(receipt) {
-                global.loggedInAddress = receipt;
-            }
-        })
     }
     render() {
         return (

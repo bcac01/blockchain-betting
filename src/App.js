@@ -37,7 +37,7 @@ web3.eth.getBalance(contractAddress, function (err, balance) {
     console.error(err);
   } else {
     console.log('Contract address: ' + contractAddress);
-    console.log('Contract balance: ' + balance);
+    console.log('Contract balance: ' + web3.utils.fromWei(balance, 'ether') + ' eth');
   }
 });
 
@@ -67,13 +67,19 @@ class App extends Component {
     }
   }
 
+  componentDidMount() {
+    if (sessionStorage.getItem('username') !== '' && sessionStorage.getItem('username') !== null) {
+      this.hideSignin();
+    }
+  }
+
   hideSignin() {
     this.setState({
       showSignin: !this.state.showSignin,
       showSignout: !this.state.showSignout,
-      showSignup:!this.state.showSignin,
-      showDashboard: !this.state.showSignout,
-      showEthPrice: !this.state.showSignout,
+      showSignup:!this.state.showSignup,
+      showDashboard: !this.state.showDashboard,
+      showEthPrice: !this.state.showEthPrice,
       showGraph: !this.state.showGraph,
       showTimer: !this.state.showTimer
     })
