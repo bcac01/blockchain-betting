@@ -18,7 +18,6 @@ const contractAddress = compiledContract.networks['300'].address;
  */
 const contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
 
-
 class Signin extends Component {
 
     constructor(props) {

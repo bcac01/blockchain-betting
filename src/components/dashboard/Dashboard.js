@@ -5,6 +5,7 @@ import moment from 'moment';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
 
+
 /**
  * Create web3 instance
  */
@@ -35,11 +36,10 @@ class Dashboard extends Component {
         super(dashboardProps)  
         this.state = {
             inputValue: '',
-            disablebutton: false,
             betAccepted: null,
             placedBet: '',
             formErrors: {
-                inputValue: ""
+            inputValue: ""
             }
         }
     }
@@ -62,25 +62,28 @@ class Dashboard extends Component {
      */
     resetBet = () => {
         sessionStorage.setItem('type', '');
+        const { click } = this.props;
+        click();
         this.setState({
-            disablebutton: !this.state.disablebutton,
             betAccepted: false
         });
     }
 
+    radi = () => {
+        console.log('Radi')
+    }
     handleBet = (e) => {
         //disable click on elements until bet accepted
-        this.setState({
-            disablebutton: !this.state.disablebutton
-        });
+        const { click } = this.props;
+        click();
         //do not proceed if the field is empty, set inline message
         let formErrors = { ...this.state.formErrors };
         if (this.state.inputValue === '') {
             formErrors.inputValue ="Please enter a bet value";
             this.setState({ 
                 formErrors,
-                disablebutton: false //not good solution
             });
+            click();
             return;
         } else {
             // check which button is pressed and save state
@@ -112,13 +115,13 @@ class Dashboard extends Component {
                                 contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
                                     web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 120).then(() => {
                                         // place bet 
-                                        contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: 300000 }).then(receipt => {
+                                        contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: "300000" , gasPrice: "15000000000" }).then(receipt => {
                                             if (receipt) {
                                                 sessionStorage.setItem('type', this.state.inputValue);
                                                 this.setState({
-                                                    disablebutton: !this.state.disablebutton,
                                                     betAccepted: true
                                                 });
+                                                global.disablebutton = false;
                                                 console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                             } else {
                                                 this.resetBet();
@@ -157,32 +160,33 @@ class Dashboard extends Component {
                 }
                     </div>
                 </div>
-                {
-                    !this.state.betAccepted ?
                 <div className="row">
                     <div className="col-sm-6">
                     <input onChange={this.updateValue} className={formErrors.inputValue.length > 0 ? "error" : null} type="text" placeholder="Bet value (ETH)"/>   
+                    <p><sup>* transaction fee is 0.00195 eth</sup></p>
                     {formErrors.inputValue.length > 0 && (
                         <p className="errorMessage">{formErrors.inputValue}</p>
                         )}
                     </div>
                     <div className="col-sm-3">
-                        <button disabled={this.state.disablebutton} className="betup" name="bet up" onClick={this.handleBet}>Bet up</button>
+                        <button disabled={global.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-3">
-                        <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
+                        <button disabled={global.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
                     </div>
                 </div>
-                : 
+                {
+                    this.state.betAccepted ?
                 <div className="row">
                     <div className="col-sm-6 column-in-center">
                         <h2>Bet placed on: {this.state.placedBet}</h2>
                         <h2>Stake: {this.state.inputValue} ETH</h2>
                     </div>
                 </div>
+                :null
                 }
                 {
-                    this.state.disablebutton?
+                    global.disablebutton?
                     <div className="loading-wrapper">
                     <div className="row">
                         <div className="col-sm-6 column-in-center">

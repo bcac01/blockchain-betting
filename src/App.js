@@ -11,6 +11,7 @@ import EthPrice from './components/ethPrice/EthPrice';
 import Graph from './components/graph/Graph';
 import Timer from './components/timer/Timer';
 
+global.disablebutton = false;
 /**
  * Create web3 instance
  */
@@ -63,8 +64,13 @@ class App extends Component {
       showEthPrice: false,
       showSignout: false,
       showGraph: false,
-      showTimer: false
+      showTimer: false,
+      disablebutton: false,
     }
+  }
+
+  changeBtnState = () =>{
+    global.disablebutton = !global.disablebutton;
   }
 
   componentDidMount() {
@@ -103,7 +109,7 @@ class App extends Component {
 
     let dashboard = null;
     if (this.state.showDashboard) {
-      dashboard = (<Dashboard view={this.hideSignin.bind(this)}/>);
+      dashboard = (<Dashboard click={this.changeBtnState} view={this.hideSignin.bind(this)}/>);
     }
     
     let ethPrice = null;

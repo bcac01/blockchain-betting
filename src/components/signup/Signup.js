@@ -73,6 +73,10 @@ class Signup extends Component {
     }
 
     signUp = () => {
+        //successAlert remove on begining
+        this.setState({
+            successAlert: false
+        });
         // check if there is empty field
         if (this.state.inputUsername === '' || this.state.inputPassword === '') {
             alert('Username or password field is empty');
@@ -89,14 +93,19 @@ class Signup extends Component {
                 contractInstance.methods.getAvailableAddresses().call().then((receipt) => {
                     if (receipt > 0) {
                         // register user
-                        contractInstance.methods.registerUser(this.state.inputUsername, this.state.inputPassword).send({ from: coinbaseAddress, gas: 200000 });
-                        this.setState({
-                            disablebutton: !this.state.disablebutton
-                        });
-                        this.setState({
-                            successAlert: !this.state.successAlert
-                        });
-                        this.clearFields();
+                        contractInstance.methods.registerUser(this.state.inputUsername, this.state.inputPassword)
+                        .send({ from: coinbaseAddress, gas: 200000 }).then(
+                            ()=>
+                            {
+                                this.setState({
+                                    disablebutton: !this.state.disablebutton
+                                });
+                                this.setState({
+                                    successAlert: !this.state.successAlert
+                                });
+                                this.clearFields();
+                            }
+                        );
                     } else {
                         this.setState({
                             infoAlert: !this.state.infoAlert
@@ -104,7 +113,7 @@ class Signup extends Component {
                         // create new account that will be available for new users 
                         this.createNewAccount();
                         this.setState({
-                            successAlert: !this.state.successAlert
+                            infoAlert: !this.state.infoAlert
                         });
                         this.clearFields();
                         this.setState({

@@ -13,7 +13,8 @@ class EthPrice extends Component {
             price: 0,
             betPrice: 0,
             priceDifference: 0,
-            currentBalance: ''
+            currentBalance: '',
+            walletAddress: ''
         }
     }
 
@@ -40,6 +41,9 @@ class EthPrice extends Component {
                 this.getUserBalance()
             });
         }, 1000);
+        this.setState({
+            walletAddress: sessionStorage.getItem('address')
+        })
     }
 
     componentWillUnmount = () => {
@@ -67,11 +71,12 @@ class EthPrice extends Component {
                 </div>
             </div>
             <div className="row">
-                <div className="col-sm-4">
-                    <h1>My wallet : </h1>
+                <div className="col-sm-12">
+                    <h1>My wallet : 
+                    <br></br>{this.state.walletAddress}</h1>
                 </div>
                 <div className="col float-left">
-                    <h2 className="float-left">{this.state.currentBalance} - ETH</h2>
+                    <h2 className="float-center">Current balance : {this.state.currentBalance} - ETH</h2>
                 </div>
             </div>
         </div>
