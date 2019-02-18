@@ -69,17 +69,18 @@ class Dashboard extends Component {
     }
 
     handleBet = (e) => {
-
         //disable click on elements until bet accepted
         this.setState({
             disablebutton: !this.state.disablebutton
         });
-
         //do not proceed if the field is empty, set inline message
         let formErrors = { ...this.state.formErrors };
         if (this.state.inputValue === '') {
             formErrors.inputValue ="Please enter a bet value";
-            this.setState({ formErrors });
+            this.setState({ 
+                formErrors,
+                disablebutton: false //not good solution
+            });
             return;
         } else {
             // check which button is pressed and save state
