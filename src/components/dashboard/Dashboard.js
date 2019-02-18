@@ -4,6 +4,7 @@ import nodeUrl from '../../eth-node-config.json';
 import moment from 'moment';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
+import { error } from 'util';
 
 
 /**
@@ -115,8 +116,11 @@ class Dashboard extends Component {
                                 contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
                                     web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 120).then(() => {
                                         // place bet 
-                                        contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: "300000" , gasPrice: "15000000000" }).then(receipt => {
+                                        contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: "300000" , gasPrice: "15000000000" })
+                                        .then(receipt => {
+                                            console.log(error)
                                             if (receipt) {
+                                                console.log(error)
                                                 sessionStorage.setItem('type', this.state.inputValue);
                                                 this.setState({
                                                     betAccepted: true
@@ -126,8 +130,12 @@ class Dashboard extends Component {
                                             } else {
                                                 this.resetBet();
                                             }
-                                        });
+                                        }).catch((err) => {
+                                            this.resetBet();
+                                            console.log("Failed with error: " + err);
+                                          });
                                     });
+                                
                                 });
                             }
                         });
