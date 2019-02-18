@@ -22,3 +22,5 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 src/eth-node-config.json
+public/update_service/ethHistory.json
+public/update_service/ethData.json

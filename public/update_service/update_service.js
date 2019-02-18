@@ -125,7 +125,7 @@ getEthPrice = () => {
 				// save eth price history
 				fs.readFile('ethHistory.json', function (err, data) {
 					let json = JSON.parse(data);
-					json.splice(0, json.length - 180);
+					json.splice(0, json.length - 300);
 					json.push(json_ethHistory);
 					const new_json = JSON.stringify(json);
 					fs.writeFile("ethHistory.json", new_json, function (err) {
@@ -181,7 +181,11 @@ updateTime = () => {
 	currentTime.minute = time.getMinutes();
 	currentTime.second = time.getSeconds();
 
-	if (currentTime.second == 0 || currentTime.second == 30) {
+	if (currentTime.second == 0 ||
+		currentTime.second == 12 ||
+		currentTime.second == 24 ||
+		currentTime.second == 36 ||
+		currentTime.second == 48) {
 		getEthPrice();
 		createNewAddress();
 	}
