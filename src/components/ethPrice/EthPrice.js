@@ -38,9 +38,12 @@ class EthPrice extends Component {
                     priceDifference: ((response.data.currentEthPrice / 
                     response.data.betEthPrice - 1) * 100).toFixed(2)
                 });
-                this.getUserBalance()
             });
         }, 1000);
+        this.timer = setInterval(() => {
+            this.getUserBalance()
+        }, 5000);
+        this.getUserBalance();
         this.setState({
             walletAddress: sessionStorage.getItem('address')
         })
