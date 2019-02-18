@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import Web3 from 'web3';
+import nodeUrl from '../../eth-node-config.json';
 
 const web3 = new Web3(nodeUrl.url);
  
@@ -19,18 +21,12 @@ class EthPrice extends Component {
      * Get user balance
      */
     getUserBalance = () => {
-        let bal = '';
-        web3.eth.getBalance(global.loggedInAddress, function (err, balance) {
-            if (err) {
-                console.log(err)
-            } 
-            else
-                bal = toString(balance);
-                this.setState({
-                    currentBalance: bal
-                })
-                console.log(bal)
-        });
+        web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=>
+        {       
+            this.setState({
+                currentBalance: balance
+            });
+        })
     }
     componentDidMount(){
         this.timer = setInterval( () => {
@@ -38,8 +34,10 @@ class EthPrice extends Component {
                 this.setState({
                     price: response.data.currentEthPrice,
                     betPrice: response.data.betEthPrice,
-                    priceDifference: ((response.data.currentEthPrice / response.data.betEthPrice - 1) * 100).toFixed(2)
+                    priceDifference: ((response.data.currentEthPrice / 
+                    response.data.betEthPrice - 1) * 100).toFixed(2)
                 });
+                this.getUserBalance()
             });
         }, 1000);
     }

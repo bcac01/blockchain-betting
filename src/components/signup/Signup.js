@@ -65,6 +65,9 @@ class Signup extends Component {
             web3.eth.personal.unlockAccount(newAddress, pass, 120).then(() => {
                 web3.eth.sendTransaction({ from: coinbaseAddress, to: newAddress, value: web3.utils.toWei("5", "ether") });
                     contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 });
+                    this.setState({
+                        infoAlert: !this.state.infoAlert
+                    });
             });
         });
     }
@@ -100,9 +103,6 @@ class Signup extends Component {
                         });
                         // create new account that will be available for new users 
                         this.createNewAccount();
-                        this.setState({
-                            infoAlert: !this.state.infoAlert
-                        });
                         this.setState({
                             successAlert: !this.state.successAlert
                         });
