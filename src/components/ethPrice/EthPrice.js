@@ -24,7 +24,7 @@ class EthPrice extends Component {
         web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=>
         {       
             this.setState({
-                currentBalance: balance
+                currentBalance: web3.utils.fromWei(balance,'ether')
             });
         })
     }
