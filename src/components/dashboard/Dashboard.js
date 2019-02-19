@@ -70,6 +70,26 @@ class Dashboard extends Component {
         });
     }
 
+    componentDidMount = () => {
+        this.betResultTimer = setInterval(() => {
+            this.checkResults();
+        }, 1000);
+    }
+
+    /**
+     * Check for bet results
+     */
+    checkResults = () => {
+        if (localStorage.getItem('bets')) {
+            let localBets = JSON.parse(localStorage.getItem('bets'));
+            console.log(localBets);
+            
+        } else {
+            console.log('no bets');
+            
+        }
+    }
+
     radi = () => {
         console.log('Radi')
     }
@@ -118,7 +138,7 @@ class Dashboard extends Component {
                                         // place bet 
                                         contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: "300000" , gasPrice: "15000000000" })
                                         .then(receipt => {
-                                            console.log(error)
+                                            console.log(error);
                                             if (receipt) {
                                                 console.log(error)
                                                 sessionStorage.setItem('type', this.state.inputValue);
@@ -126,6 +146,18 @@ class Dashboard extends Component {
                                                     betAccepted: true
                                                 });
                                                 global.disablebutton = false;
+                                                // save bet to local storage
+                                                let myBets;
+                                                if (localStorage.getItem('bets')) {
+                                                    myBets = JSON.parse(localStorage.getItem('bets'));
+                                                } else {
+                                                    myBets = [];
+                                                }
+                                                myBets.push({
+                                                    'betType': placedBetNumber,
+                                                    'betTime': new Date()
+                                                });
+                                                localStorage.setItem('bets', JSON.stringify(myBets));
                                                 console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                             } else {
                                                 this.resetBet();
