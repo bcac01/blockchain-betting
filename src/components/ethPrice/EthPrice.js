@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Web3 from 'web3';
 import nodeUrl from '../../eth-node-config.json';
+var QRCode = require('qrcode.react');
 
 const web3 = new Web3(nodeUrl.url);
  
@@ -52,7 +53,6 @@ class EthPrice extends Component {
     componentWillUnmount = () => {
         clearTimeout(this.getBalanceTimer);
         clearTimeout(this.timer);
-        clearTimeout(this.timer2);
     };
 
     render() {
@@ -79,6 +79,19 @@ class EthPrice extends Component {
                 <div className="col-sm-12">
                     <h1>My wallet : 
                     <br></br>{this.state.walletAddress}</h1>
+                    <div className="col-sm-12">
+                    <div className="qrdiv col-sm-3 offset-5">
+                        <QRCode 
+                        value={this.state.walletAddress}
+                        size={180}
+                        bgColor={"#ffffff"}
+                        fgColor={"#000000"}
+                        level={"L"}
+                        includeMargin={false}
+                        renderAs={"canvas"}
+                        />
+                    </div>
+                    </div>
                 </div>
                 <div className="col float-left">
                     <h2 className="float-center">Current balance : {this.state.currentBalance} - ETH</h2>
