@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+import moment from 'moment';
 import nodeUrl from './eth-node-config.json';
 import './App.css';
 import Web3 from 'web3';
@@ -66,8 +68,9 @@ class App extends Component {
       showSignout: false,
       showGraph: false,
       showTimer: false,
-      showWithdraw: false,
+      showServiceMsg: false,
       disablebutton: false,
+      showWithdraw: false,
     }
   }
 
@@ -79,6 +82,13 @@ class App extends Component {
     if (sessionStorage.getItem('username') !== '' && sessionStorage.getItem('username') !== null) {
       this.hideSignin();
     }
+
+    // disable app if node service is down for more than 5 seconds
+    this.serviceTimer = setInterval(() => {
+      this.checkService();
+      if (this.state.showServiceMsg === true)
+        clearTimeout(this.serviceTimer);
+    }, 1000);
   }
 
   hideSignin() {
@@ -92,6 +102,26 @@ class App extends Component {
       showTimer: !this.state.showTimer,
       showWithdraw: !this.state.showWithdraw,
     })
+  }
+
+  checkService = () => {
+    axios.get('/update_service/ethData.json').then(response => {
+      if (moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') > 5) {
+        this.setState({
+          showSignin: false,
+          showSignout: false,
+          showSignup: false,
+          showDashboard: false,
+          showEthPrice: false,
+          showGraph: false,
+          showTimer: false,
+          showWithdraw: false,
+          showServiceMsg: true
+        });
+        sessionStorage.clear();
+        console.log('time not ok');
+      }
+    });
   }
 
   render() {
@@ -134,6 +164,10 @@ class App extends Component {
     if(this.state.showWithdraw) {
       withdraw = (<Withdraw click={this.changeBtnState} view={this.hideSignin.bind(this)}/>);
     }
+    let serviceMsg = null;
+    if (this.state.showServiceMsg) {
+      serviceMsg = (<h1>Service temporarily unavailable, please try again later</h1>);
+    }
 
     return (
       <div className="App">
@@ -171,7 +205,12 @@ class App extends Component {
             </div>
             <div className="row">
               <div className="col">
-                {withdraw}
+              {withdraw}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col">
+                {serviceMsg}
               </div>
             </div>
         </div>

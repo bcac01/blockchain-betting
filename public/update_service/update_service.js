@@ -22,7 +22,8 @@ let coinbaseAddress = '',
 	ethData = {
 		'currentEthPrice': '',
 		'betEthPrice': '',
-		'roundTime': ''
+		'roundTime': '',
+		'updateTime': ''
 	},
 	json_ethHistory = {};
 
@@ -37,10 +38,13 @@ web3.eth.getCoinbase().then(result => {
  * Set initial eth price values and round time when service is restarted
  */
 fs.readFile('ethData.json', function (err, data) {
-	var json = JSON.parse(data);
-	ethData.currentEthPrice = json.currentEthPrice;
-	ethData.betEthPrice = json.betEthPrice;
-	ethData.roundTime = json.roundTime;
+	if (data) {
+		var json = JSON.parse(data);
+		ethData.currentEthPrice = json.currentEthPrice;
+		ethData.betEthPrice = json.betEthPrice;
+		ethData.roundTime = json.roundTime;
+		ethData.updateTime = json.updateTime;
+	}
 });
 
 /**
@@ -108,6 +112,7 @@ getEthPrice = () => {
 					!betPriceSet) {
 					ethData.betEthPrice = ethData.currentEthPrice;
 					ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
+					ethData.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 					betPriceSet = true;
 					const logTime = new Date();
 					console.log(logTime);
@@ -180,6 +185,20 @@ updateTime = () => {
 	currentTime.hour = time.getHours();
 	currentTime.minute = time.getMinutes();
 	currentTime.second = time.getSeconds();
+
+	// set node service update time
+	fs.readFile('ethData.json', function (err, data) {
+		if (data) {
+			var json = JSON.parse(data);
+			ethData.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
+			json.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
+			const updatedJson = JSON.stringify(json);
+			fs.writeFile("ethData.json", updatedJson, function (err) {
+				const logTime = new Date();
+				// console.log(logTime + ': Data saved.');
+			});
+		}
+	});
 
 	if (currentTime.second == 0 ||
 		currentTime.second == 12 ||
