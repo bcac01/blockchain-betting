@@ -40,7 +40,7 @@ class EthPrice extends Component {
                 });
             });
         }, 1000);
-        this.timer = setInterval(() => {
+        this.timer2 = setInterval(() => {
             this.getUserBalance()
         }, 5000);
         this.getUserBalance();
@@ -51,6 +51,7 @@ class EthPrice extends Component {
 
     componentWillUnmount = () => {
         clearTimeout(this.timer);
+        clearTimeout(this.timer2);
     };
 
     render() {

@@ -10,6 +10,7 @@ import Dashboard from './components/dashboard/Dashboard';
 import EthPrice from './components/ethPrice/EthPrice';
 import Graph from './components/graph/Graph';
 import Timer from './components/timer/Timer';
+import Withdraw from './components/withdraw/Withdraw';
 
 global.disablebutton = false;
 /**
@@ -65,6 +66,7 @@ class App extends Component {
       showSignout: false,
       showGraph: false,
       showTimer: false,
+      showWithdraw: false,
       disablebutton: false,
     }
   }
@@ -87,7 +89,8 @@ class App extends Component {
       showDashboard: !this.state.showDashboard,
       showEthPrice: !this.state.showEthPrice,
       showGraph: !this.state.showGraph,
-      showTimer: !this.state.showTimer
+      showTimer: !this.state.showTimer,
+      showWithdraw: !this.state.showWithdraw,
     })
   }
 
@@ -127,6 +130,11 @@ class App extends Component {
       timer = (<Timer />);
     }
 
+    let withdraw = null;
+    if(this.state.showWithdraw) {
+      withdraw = (<Withdraw click={this.changeBtnState} view={this.hideSignin.bind(this)}/>);
+    }
+
     return (
       <div className="App">
         <div className="container">
@@ -159,6 +167,11 @@ class App extends Component {
             <div className="row">
               <div className="col">
                 {timer}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col">
+                {withdraw}
               </div>
             </div>
         </div>

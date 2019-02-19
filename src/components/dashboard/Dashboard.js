@@ -4,7 +4,6 @@ import nodeUrl from '../../eth-node-config.json';
 import moment from 'moment';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
-import { error } from 'util';
 
 
 /**
@@ -36,6 +35,7 @@ class Dashboard extends Component {
     constructor(dashboardProps) {
         super(dashboardProps)  
         this.state = {
+            betting: false,
             inputValue: '',
             betAccepted: null,
             placedBet: '',
@@ -54,8 +54,7 @@ class Dashboard extends Component {
     
         formErrors.inputValue = value.length === 0 ? "Please enter a bet value" : "";
     
-        // TODO : remove logging
-        this.setState({ formErrors, inputValue: value }, () => console.log(this.state));
+        this.setState({ formErrors, inputValue: value });
     }
 
     /**
@@ -66,17 +65,18 @@ class Dashboard extends Component {
         const { click } = this.props;
         click();
         this.setState({
-            betAccepted: false
+            betAccepted: false,
+            betting: false
         });
     }
 
-    radi = () => {
-        console.log('Radi')
-    }
     handleBet = (e) => {
         //disable click on elements until bet accepted
         const { click } = this.props;
         click();
+        this.setState({
+            betting: true  
+        })
         //do not proceed if the field is empty, set inline message
         let formErrors = { ...this.state.formErrors };
         if (this.state.inputValue === '') {
@@ -85,6 +85,9 @@ class Dashboard extends Component {
                 formErrors,
             });
             click();
+            this.setState({
+                betting: false  
+            })
             return;
         } else {
             // check which button is pressed and save state
@@ -118,14 +121,13 @@ class Dashboard extends Component {
                                         // place bet 
                                         contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: "300000" , gasPrice: "15000000000" })
                                         .then(receipt => {
-                                            console.log(error)
                                             if (receipt) {
-                                                console.log(error)
                                                 sessionStorage.setItem('type', this.state.inputValue);
                                                 this.setState({
-                                                    betAccepted: true
+                                                    betAccepted: true,
+                                                    betting: false
                                                 });
-                                                global.disablebutton = false;
+                                                global.disablebutton = false
                                                 console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                             } else {
                                                 this.resetBet();
@@ -151,26 +153,30 @@ class Dashboard extends Component {
         return (
             <div className="dashboard-wrapper">
             <div className="row">
-                <div className="col">
                 {
-                    this.state.betAccepted ?
-                    <div className="alert alert-success alert-dismissible">
-                    <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
-                        Thank you for your bet.
-                    </div> 
-                    :
-                    this.state.betAccepted != null ? //state.betAccepted is null by default, this prevents alert from popping up when we log in and haven't placed bet yet
-                    <div className="alert alert-danger alert-dismissible">
-                    <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
-                        Your bet was rejected.
-                    </div>
-                    : null
+                this.state.betAccepted ?
+                    <div className="col">
+                        <div className="alert alert-success alert-dismissible">
+                        <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            Thank you for your bet.
+                        </div> 
+                    </div>    
+                :null
                 }
+                {
+                    !this.state.betAccepted && this.state.betAccepted != null ? 
+                    <div className="col">
+                        <div className="alert alert-danger alert-dismissible">
+                        <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                            Your bet was rejected.
+                        </div>
                     </div>
+                    :null
+                }
                 </div>
                 <div className="row">
                     <div className="col-sm-6">
-                    <input onChange={this.updateValue} className={formErrors.inputValue.length > 0 ? "error" : null} type="text" placeholder="Bet value (ETH)"/>   
+                    <input onChange={this.updateValue} className={formErrors.inputValue.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)"/>   
                     <p><sup>* transaction fee is 0.00195 eth</sup></p>
                     {formErrors.inputValue.length > 0 && (
                         <p className="errorMessage">{formErrors.inputValue}</p>
@@ -184,7 +190,7 @@ class Dashboard extends Component {
                     </div>
                 </div>
                 {
-                    this.state.betAccepted ?
+                    this.state.betAccepted?
                 <div className="row">
                     <div className="col-sm-6 column-in-center">
                         <h2>Bet placed on: {this.state.placedBet}</h2>
@@ -194,7 +200,7 @@ class Dashboard extends Component {
                 :null
                 }
                 {
-                    global.disablebutton?
+                    this.state.betting?
                     <div className="loading-wrapper">
                     <div className="row">
                         <div className="col-sm-6 column-in-center">
