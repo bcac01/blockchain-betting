@@ -52,6 +52,7 @@ class EthPrice extends Component {
     componentWillUnmount = () => {
         clearTimeout(this.getBalanceTimer);
         clearTimeout(this.timer);
+        clearTimeout(this.timer2);
     };
 
     render() {

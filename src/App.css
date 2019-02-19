@@ -30,8 +30,13 @@ p{
 }
 
 
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
 
-input[type="text"],input[type="password"]{
+input[type="text"],input[type="password"],input[type="number"]{
   width:98%;
   padding:15px 0px 15px 8px;
   border-radius:5px;
