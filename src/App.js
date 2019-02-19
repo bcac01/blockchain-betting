@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import axios from 'axios';
+import moment from 'moment';
 import nodeUrl from './eth-node-config.json';
 import './App.css';
 import Web3 from 'web3';
@@ -63,7 +65,8 @@ class App extends Component {
       showEthPrice: false,
       showSignout: false,
       showGraph: false,
-      showTimer: false
+      showTimer: false,
+      showServiceMsg: false
     }
   }
 
@@ -71,6 +74,13 @@ class App extends Component {
     if (sessionStorage.getItem('username') !== '' && sessionStorage.getItem('username') !== null) {
       this.hideSignin();
     }
+
+    // disable app if node service is down for more than 5 seconds
+    this.serviceTimer = setInterval(() => {
+      this.checkService();
+      if (this.state.showServiceMsg === true)
+        clearTimeout(this.serviceTimer);
+    }, 1000);
   }
 
   hideSignin() {
@@ -83,6 +93,25 @@ class App extends Component {
       showGraph: !this.state.showGraph,
       showTimer: !this.state.showTimer
     })
+  }
+
+  checkService = () => {
+    axios.get('/update_service/ethData.json').then(response => {
+      if (moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') > 5) {
+        this.setState({
+          showSignin: false,
+          showSignout: false,
+          showSignup: false,
+          showDashboard: false,
+          showEthPrice: false,
+          showGraph: false,
+          showTimer: false,
+          showServiceMsg: true
+        });
+        sessionStorage.clear();
+        console.log('time not ok');
+      }
+    });
   }
 
   render() {
@@ -121,6 +150,11 @@ class App extends Component {
       timer = (<Timer />);
     }
 
+    let serviceMsg = null;
+    if (this.state.showServiceMsg) {
+      serviceMsg = (<h1>Service temporarily unavailable, please try again later</h1>);
+    }
+
     return (
       <div className="App">
         <div className="container">
@@ -153,6 +187,11 @@ class App extends Component {
             <div className="row">
               <div className="col">
                 {timer}
+              </div>
+            </div>
+            <div className="row">
+              <div className="col">
+                {serviceMsg}
               </div>
             </div>
         </div>
