@@ -48,18 +48,17 @@ class EthPrice extends Component {
      * Get total/up/down bet amount
      */
     getTotalBetAmount = () => {
-        web3.eth.getBalance(contractAddress).then((balance) =>
-        {
-            this.setState({
-                totalBetAmount: web3.utils.fromWei(balance,'ether')
-            });
-            console.log('TotalBetAmount:' + this.state.totalBetAmount)
+        contractInstance.methods.BetStatistics().call()
+        .then((response) => {
+             this.setState({
+                 totalBetAmount: web3.utils.fromWei(response[0],'ether'),
+                 totalBetDownAmount: web3.utils.fromWei(response[1],'ether'),
+                 totalBetUpAmount: web3.utils.fromWei(response[2],'ether'),
+             });
         });
     }
 
     componentDidMount(){
-        this.getTotalBetAmount();
-        console.log(this.state.totalBetAmount);
         this.timer = setInterval( () => {
             axios.get('/update_service/ethData.json').then(response => {
                 this.setState({
@@ -107,10 +106,13 @@ class EthPrice extends Component {
             </div>
             <div className="row">
                 <div className="col-sm-12">
-                    <h1>My wallet : 
-                    <br></br>{this.state.walletAddress}</h1>
-                    <div className="col-sm-12">
-                    <div className="qrdiv col-sm-3 offset-5">
+                    <h1>My wallet :</h1>
+                </div>
+                <div className="col-sm-12">
+                    <h1 className="myWallet">{this.state.walletAddress}</h1>
+                </div>
+                <div className="col-sm-12 col-centered">
+                    <div className="qrdiv col-sm-12 col-centered">
                         <QRCode 
                         value={this.state.walletAddress}
                         size={180}
@@ -121,10 +123,23 @@ class EthPrice extends Component {
                         renderAs={"canvas"}
                         />
                     </div>
-                    </div>
                 </div>
-                <div className="col float-left">
+                <div className="col float-center myWallet">
                     <h2 className="float-center">Current balance : {this.state.currentBalance} - ETH</h2>
+                </div>
+            </div>
+            <div className="row">
+                <div className="col-sm-4">
+                    <h1>Bet up amount</h1>
+                    <h2>{this.state.totalBetUpAmount} -ETH</h2>
+                </div>
+                <div className="col-sm-4">
+                    <h1>Total Bet amount</h1>
+                    <h2>{this.state.totalBetAmount} -ETH</h2>
+                </div>
+                <div className="col-sm-4">
+                    <h1>Bet down amount</h1>
+                    <h2>{this.state.totalBetDownAmount} -ETH</h2>
                 </div>
             </div>
         </div>

@@ -14,15 +14,16 @@ body{
 }
 
 h1{
-  padding:30px 0px 0px 0px;
+  padding:5px 0px 0px 0px;
   font:25px Oswald;
   color:#FFF;
   text-shadow:#000 0px 1px 5px;
   margin:0px;
+  overflow-wrap: normal;
 }
 
 h2{
-  padding:30px 0px 0px 0px;
+  padding:5px 0px 0px 0px;
   font:25px Oswald;
   color:rgb(47, 182, 35);
   text-shadow:#000 0px 1px 5px;
@@ -33,7 +34,7 @@ p{
   font:13px Open Sans;
   color:#6E6E6E;
   text-shadow:#000 0px 1px 5px;
-  margin-bottom:30px;
+  margin-bottom:5px;
 }
 
 
@@ -45,12 +46,13 @@ input[type=number]::-webkit-outer-spin-button {
 
 input[type="text"],input[type="password"],input[type="number"]{
   width:98%;
-  padding:15px 0px 15px 8px;
+  padding:15px 15px 15px 15px;
   border-radius:5px;
   box-shadow:inset 4px 6px 10px -4px rgba(0,0,0,0.3), 0 1px 1px -1px rgba(255,255,255,0.3);
 	background:rgba(0,0,0,0.2);
   border:1px solid rgba(0,0,0,1);
   margin-bottom:10px;
+  margin-top: 10px;
   color:#6E6E6E;
   text-shadow:#000 0px 1px 5px;
 }
@@ -80,6 +82,7 @@ button[type="submit"]{
 .betup{
   width:90%;
   padding:15px;
+  margin-top: 12px;
   border-radius:5px;
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(rgb(55, 222, 40)), to(rgb(47, 182, 35)));
   background-image: -webkit-linear-gradient(rgb(55, 222, 40) 0%, rgb(47, 182, 35) 100%);
@@ -101,6 +104,7 @@ button[type="submit"]{
 .betdown{
   width:90%;
   padding:15px;
+  margin-top: 12px;
   border-radius:5px;
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(rgb(207, 3, 3)), to(rgb(212, 47, 47)));
   background-image: -webkit-linear-gradient(rgb(207, 3, 3) 0%, rgb(212, 47, 47) 100%);
@@ -121,7 +125,7 @@ button[type="submit"]{
 }
 
 .signout{
-  width:20%;
+  width:25%;
   float: right!important;
   padding:15px;
   border-radius:5px;
@@ -246,4 +250,16 @@ input.error {
   color: red;
   text-shadow:#000 0px 1px 5px;
   margin-bottom:30px;
+}
+
+.myWallet
+{
+  font-size: 20px;
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+.col-centered{
+  float: none;
+  margin: 0 auto;
 }

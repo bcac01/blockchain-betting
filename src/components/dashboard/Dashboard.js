@@ -80,14 +80,14 @@ class Dashboard extends Component {
      * Check for bet results
      */
     checkResults = () => {
-        if (localStorage.getItem('bets')) {
-            let localBets = JSON.parse(localStorage.getItem('bets'));
-            console.log(localBets);
+        // if (localStorage.getItem('bets')) {
+        //     let localBets = JSON.parse(localStorage.getItem('bets'));
+        //     console.log(localBets);
             
-        } else {
-            console.log('no bets');
+        // } else {
+        //     console.log('no bets');
             
-        }
+        // }
     }
 
     handleBet = (e) => {
@@ -207,15 +207,15 @@ class Dashboard extends Component {
                 }
                 </div>
                 <div className="row">
+                    <div className="col-sm-3">
+                        <button disabled={global.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
+                    </div>
                     <div className="col-sm-6">
                     <input onChange={this.updateValue} className={formErrors.inputValue.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)"/>   
                     <p><sup>* transaction fee is 0.00195 eth</sup></p>
                     {formErrors.inputValue.length > 0 && (
                         <p className="errorMessage">{formErrors.inputValue}</p>
                         )}
-                    </div>
-                    <div className="col-sm-3">
-                        <button disabled={global.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-3">
                         <button disabled={global.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
@@ -235,13 +235,13 @@ class Dashboard extends Component {
                     this.state.betting?
                     <div className="loading-wrapper">
                     <div className="row">
-                        <div className="col-sm-6 column-in-center">
+                        <div className="col-sm-6 col-centered">
                             <h2>Accepting bet...</h2>
                         </div>
                     </div>
                     <div className="row">
-                        <div className="col-sm-2 column-in-center">
-                            <div className="loader"></div>
+                        <div className="col-sm-2 col-centered">
+                            <div className="loader col-centered"></div>
                         </div>
                     </div>
                     </div>

@@ -12,7 +12,7 @@ class Signout extends Component {
 
     render() {
         return (
-            <div className="col-sm-12 pull-right">
+            <div className="col-sm-12">
                 <button className="signout pull-right" onClick={this.signOut}>Sign out</button>
             </div>
         );
