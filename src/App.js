@@ -189,9 +189,7 @@ class App extends Component {
               </div>
             </div>
             <div className="row">
-              <div className="col">
                 {graph}
-              </div>
             </div>
             <div className="row">
               <div className="col">

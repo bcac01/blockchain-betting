@@ -115,7 +115,7 @@ class Graph extends React.Component {
 
     render() {
         return (
-            <div>
+            <div className="col-sm-12">
                 <canvas
                     style={{ width: 800, height: 300 }}
                     ref={node => (this.node = node)}

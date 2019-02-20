@@ -116,6 +116,7 @@ class Signin extends Component {
                     this.state.dangerAlert?
                         <div className="row">
                             <div className="alert alert-danger col">
+                            <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
                                 <strong>Warning!</strong> Username or password field is empty.
                             </div>
                         </div>
@@ -125,6 +126,7 @@ class Signin extends Component {
                     this.state.warningAlert?
                         <div className="row">
                             <div className="alert alert-warning col">
+                            <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
                                 <strong>Warning!</strong> Wrong username or password.
                             </div>
                         </div>

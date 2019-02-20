@@ -151,13 +151,13 @@ class Signup extends Component {
                     this.state.disablebutton?
                     <div className="loading-wrapper">
                         <div className="row">
-                            <div className="col-sm-6 column-in-center">
+                            <div className="col-sm-6 col-centered">
                                 <h2>Signing up...</h2>
                             </div>
                         </div>
                         <div className="row">
-                            <div className="col-sm-3 column-in-center">
-                                <div className="loader"></div>
+                            <div className="col-sm-3 col-centered">
+                                <div className="loader col-centered"></div>
                             </div>
                         </div>
                     </div>
@@ -167,7 +167,8 @@ class Signup extends Component {
                     this.state.successAlert?
                         <div className="row">
                             <div className="alert alert-success col">
-                                <strong>Wellcome!</strong> Account successfully created.
+                            <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <strong>Welcome!</strong> Account successfully created.
                             </div>
                         </div>
                     :null
@@ -176,6 +177,7 @@ class Signup extends Component {
                     this.state.successInfo?
                         <div className="row">
                             <div className="alert alert-info col">
+                            <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
                                 <strong>Info!</strong> Please wait until new address is genereted
                             </div>
                         </div>
