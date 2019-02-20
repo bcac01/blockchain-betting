@@ -2,10 +2,21 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import Web3 from 'web3';
 import nodeUrl from '../../eth-node-config.json';
+import compiledContract from '../../truffle/build/contracts/BettingApp.json';
 var QRCode = require('qrcode.react');
 
 const web3 = new Web3(nodeUrl.url);
- 
+
+/**
+ * Get address from compiled contract
+ */
+const contractAddress = compiledContract.networks['300'].address;
+
+/**
+ * Create contract instance
+ */
+const contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
+
 class EthPrice extends Component {
 
     constructor(ethPriceProps) {
@@ -15,7 +26,10 @@ class EthPrice extends Component {
             betPrice: 0,
             priceDifference: 0,
             currentBalance: '',
-            walletAddress: ''
+            walletAddress: '',
+            totalBetAmount: 0,
+            totalBetUpAmount: 0,
+            totalBetDownAmount: 0
         }
     }
 
@@ -30,7 +44,22 @@ class EthPrice extends Component {
             });
         })
     }
+    /**
+     * Get total/up/down bet amount
+     */
+    getTotalBetAmount = () => {
+        web3.eth.getBalance(contractAddress).then((balance) =>
+        {
+            this.setState({
+                totalBetAmount: web3.utils.fromWei(balance,'ether')
+            });
+            console.log('TotalBetAmount:' + this.state.totalBetAmount)
+        });
+    }
+
     componentDidMount(){
+        this.getTotalBetAmount();
+        console.log(this.state.totalBetAmount);
         this.timer = setInterval( () => {
             axios.get('/update_service/ethData.json').then(response => {
                 this.setState({
@@ -42,7 +71,8 @@ class EthPrice extends Component {
             });
         }, 1000);
         this.getBalanceTimer = setInterval(() => {
-            this.getUserBalance()
+            this.getUserBalance();
+            this.getTotalBetAmount();
         }, 5000);
         this.getUserBalance();
         this.setState({
