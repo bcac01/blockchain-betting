@@ -174,4 +174,8 @@ contract BettingApp {
             contractOwner.transfer(address(this).balance);
         }
     }
+
+    function BetStatistics() public view returns (uint _totalBetAmount, uint _totalBetDownAmount, uint _totalBetUpAmount) {
+        return (totalBetAmount,totalBetDownAmount,totalBetUpAmount);
+    }
 }
