@@ -130,7 +130,9 @@ class Dashboard extends Component {
                     } else {
                         // check if user have enough funds
                         web3.eth.getBalance(sessionStorage.getItem('address')).then(balance => {
-                            if (balance < this.state.inputValue) {
+                            console.log(web3.utils.fromWei(balance,'ether'));
+                            console.log(this.state.inputValue);
+                            if (web3.utils.fromWei(balance,'ether') < this.state.inputValue) {
                                 alert('You don\'t have enough funds');
                                 this.resetBet();
                                 return;

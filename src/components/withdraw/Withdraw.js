@@ -76,80 +76,91 @@ class Withdraw extends Component {
          formErrorsValue.inputValue = value.length === 0 ? "Please enter value" : "";
          this.setState({ formErrorsValue, inputValue: value });
         }
+        
     handleWithward = (e) => {
-    //disable click on elements until bet accepted
-    const { click } = this.props;
-    click();
-    let formErrorsAddress = { ...this.state.formErrorsAddress };
-    let formErrorsValue = { ...this.state.formErrorsValue };
-        if (this.state.inputAddress === '' || this.state.inputValue === '') {
-            if (this.state.inputAddress === '')
-            {
-                formErrorsAddress.inputAddress ="Please enter wallet address";
-                this.setState({ 
-                    formErrorsAddress,
-                })
-                click();
+        let formErrorsAddress = { ...this.state.formErrorsAddress };
+        let formErrorsValue = { ...this.state.formErrorsValue };
+    if (this.state.inputAddress.length === 42 && web3.utils.isAddress(this.state.inputAddress)) 
+    {
+        //disable click on elements until bet accepted
+        const { click } = this.props;
+        click();
+            if (this.state.inputAddress === '' || this.state.inputValue === '') {
+                if (this.state.inputAddress === '')
+                {
+                    formErrorsAddress.inputAddress ="Please enter wallet address";
+                    this.setState({ 
+                        formErrorsAddress,
+                    })
+                    click();
+                }
+                else
+                {
+                    formErrorsValue.inputValue ="Please enter value";
+                    this.setState({ 
+                        formErrorsValue,
+                    });
+                    click();
+                }
+                return;
             }
             else
             {
-                formErrorsValue.inputValue ="Please enter value";
-                this.setState({ 
-                    formErrorsValue,
-                });
-                click();
-            }
-            return;
-        }
-        else
-        {
-            if (sessionStorage.getItem('address').toUpperCase() !== this.state.inputAddress.toUpperCase())
-            {
-                this.setState({
-                    successInfo: !this.state.successInfo
-                })
-                if (this.state.successError)
+                if (sessionStorage.getItem('address').toUpperCase() !== this.state.inputAddress.toUpperCase())
                 {
                     this.setState({
-                        successError: false
+                        successInfo: !this.state.successInfo
                     })
+                    if (this.state.successError)
+                    {
+                        this.setState({
+                            successError: false
+                        })
+                    }
+                    if (this.state.successAlert)
+                    {
+                        this.setState({
+                            successAlert: false
+                        })
+                    }
+                    contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
+                    web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 120).then(() => {
+                    web3.eth.sendTransaction({ from: sessionStorage.getItem('address'), 
+                    to: this.state.inputAddress, value: web3.utils.toWei(this.state.inputValue, "ether") })
+                    .then(() => {
+                        this.setState({
+                            successAlert: !this.state.successAlert,
+                            successInfo: !this.state.successInfo,
+                        })
+                        click();
+                    })
+                    .catch((err) => {
+                        click();
+                        this.setState({
+                            successInfo: !this.state.successInfo,
+                            successError: true
+                        })
+                        console.log("Failed with error: " + err);
+                    });
+                    })})
                 }
-                if (this.state.successAlert)
-                {
-                    this.setState({
-                        successAlert: false
-                    })
-                }
-                contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
-                web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 120).then(() => {
-                web3.eth.sendTransaction({ from: sessionStorage.getItem('address'), 
-                to: this.state.inputAddress, value: web3.utils.toWei(this.state.inputValue, "ether") })
-                .then(() => {
-                    this.setState({
-                        successAlert: !this.state.successAlert,
-                        successInfo: !this.state.successInfo,
-                    })
-                    click();
-                })
-                .catch((err) => {
+                else
+                { 
                     click();
                     this.setState({
-                        successInfo: !this.state.successInfo,
                         successError: true
                     })
-                    console.log("Failed with error: " + err);
-                });
-                })})
+                }
             }
-            else
-            { 
-                click();
-                this.setState({
-                    successError: true
-                })
-            }
-        }
     }
+    else
+    {
+            formErrorsAddress.inputAddress ="Please enter valid wallet address";
+            this.setState({ 
+                formErrorsAddress,
+            })
+    }
+}
 
     render() {
         const { formErrorsAddress } = this.state;

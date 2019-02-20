@@ -74,6 +74,7 @@ class EthPrice extends Component {
             this.getTotalBetAmount();
         }, 5000);
         this.getUserBalance();
+        this.getTotalBetAmount();
         this.setState({
             walletAddress: sessionStorage.getItem('address')
         })

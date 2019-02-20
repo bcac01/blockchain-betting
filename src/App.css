@@ -30,6 +30,22 @@ h2{
   margin:0px;
 }
 
+.h2Red{
+  padding:5px 0px 0px 0px;
+  font:25px Oswald;
+  color:rgb(207, 3, 3);
+  text-shadow:#000 0px 1px 5px;
+  margin:0px;
+}
+
+.h2Yellow{
+  padding:5px 0px 0px 0px;
+  font:25px Oswald;
+  color:rgba(223, 202, 16, 0.911);
+  text-shadow:#000 0px 1px 5px;
+  margin:0px;
+}
+
 p{
   font:13px Open Sans;
   color:#6E6E6E;
