@@ -45,17 +45,6 @@ web3.eth.getBalance(contractAddress, function (err, balance) {
   }
 });
 
-/**
- * List all accounts with their balance
- */
-// web3.eth.getAccounts().then(result => {
-  // result.forEach(address => {
-    // web3.eth.getBalance(address).then(balance => {
-      // console.log('Address: ' + address + ', balance: ' + web3.utils.fromWei(balance, 'ether') + ' ether');
-    // });
-  // });
-// });
-
 class App extends Component {
 
   constructor(props){
