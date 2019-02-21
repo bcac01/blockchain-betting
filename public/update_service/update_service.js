@@ -2,6 +2,7 @@ const nodeUrl = require('../../src/eth-node-config'),
 	request = require('request'),
 	fs = require('fs'),
 	Web3 = require('web3'),
+	moment = require('moment-timezone'),
 	compiledContract = require('../../src/truffle/build/contracts/BettingApp.json'),
 	web3 = new Web3(nodeUrl.url),
 	contractAddress = compiledContract.networks['300'].address,
@@ -51,7 +52,7 @@ fs.readFile('ethData.json', function (err, data) {
  * Reset ETH history data when service is restarted
  */
 fs.writeFile("ethHistory.json", '[]', function (err) {
-	const logTime = new Date();
+	const logTime = moment().tz("Europe/Belgrade").format();
 	console.log(logTime);
 	console.log('ETH history data erased.');
 	console.log('------------------------');
@@ -114,7 +115,7 @@ getEthPrice = () => {
 					ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 					ethData.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 					betPriceSet = true;
-					const logTime = new Date();
+					const logTime = moment().tz("Europe/Belgrade").format();
 					console.log(logTime);
 					console.log('New round started, betting against ETH price: ' + ethData.betEthPrice);
 					console.log('------------------------');
@@ -124,7 +125,7 @@ getEthPrice = () => {
 				// save eth price and time data
 				const json = JSON.stringify(ethData);
 				fs.writeFile("ethData.json", json, function (err) {
-					const logTime = new Date();
+					const logTime = moment().tz("Europe/Belgrade").format();
 					// console.log(logTime + ': Data saved.');
 				});
 				// save eth price history
@@ -134,7 +135,7 @@ getEthPrice = () => {
 					json.push(json_ethHistory);
 					const new_json = JSON.stringify(json);
 					fs.writeFile("ethHistory.json", new_json, function (err) {
-						const logTime = new Date();
+						const logTime = moment().tz("Europe/Belgrade").format();
 						// console.log(logTime + ': ETH history data saved.');
 					});
 				});
@@ -156,7 +157,7 @@ distributeRewards = () => {
 	} else {
 		winningBet = 2;
 	}
-	const logTime = new Date();
+	const logTime = moment().tz("Europe/Belgrade").format();
 	console.log(logTime);
 	console.log('Winning bet: ' + winningBet);
 	console.log('------------------------');
@@ -164,7 +165,7 @@ distributeRewards = () => {
 		if (unlocked) {
 			contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
 				betPriceSet = false;
-				const logTime = new Date();
+				const logTime = moment().tz("Europe/Belgrade").format();
 				console.log(logTime);
 				console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
 				console.log('------------------------');
@@ -178,13 +179,13 @@ distributeRewards = () => {
  */
 updateTime = () => {
 	setTimeout(updateTime, 1000);
-	const time = new Date();
-	currentTime.year = time.getYear() + 1900;
-	currentTime.month = time.getMonth() + 1;
-	currentTime.day = time.getDate();
-	currentTime.hour = time.getHours();
-	currentTime.minute = time.getMinutes();
-	currentTime.second = time.getSeconds();
+	const time = moment().tz("Europe/Belgrade");
+	currentTime.year = time.get('year');
+	currentTime.month = time.get('month') + 1;
+	currentTime.day = time.get('date');
+	currentTime.hour = time.get('hour');
+	currentTime.minute = time.get('minute');
+	currentTime.second = time.get('second');
 
 	// set node service update time
 	fs.readFile('ethData.json', function (err, data) {
@@ -194,7 +195,7 @@ updateTime = () => {
 			json.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 			const updatedJson = JSON.stringify(json);
 			fs.writeFile("ethData.json", updatedJson, function (err) {
-				const logTime = new Date();
+				const logTime = moment().tz("Europe/Belgrade").format();
 				// console.log(logTime + ': Data saved.');
 			});
 		}
