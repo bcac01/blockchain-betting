@@ -39,12 +39,15 @@ web3.eth.getCoinbase().then(result => {
  * Set initial eth price values and round time when service is restarted
  */
 fs.readFile('ethData.json', function (err, data) {
-	if (data) {
+	try {
+		JSON.parse(data);
 		var json = JSON.parse(data);
 		ethData.currentEthPrice = json.currentEthPrice;
 		ethData.betEthPrice = json.betEthPrice;
 		ethData.roundTime = json.roundTime;
 		ethData.updateTime = json.updateTime;
+	} catch (e) {
+		console.log('ethData not valid: ' + e);
 	}
 });
 
@@ -148,30 +151,32 @@ getEthPrice = () => {
  * Distribute rewards on time
  */
 distributeRewards = () => {
-	lastPayoutTime = currentTime.hour + ':' + currentTime.minute;
-	let winningBet;
-	if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) == 0) {
-		winningBet = 0;
-	} else if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) < 0) {
-		winningBet = 1;
-	} else {
-		winningBet = 2;
-	}
-	const logTime = moment().tz("Europe/Belgrade").format();
-	console.log(logTime);
-	console.log('Winning bet: ' + winningBet);
-	console.log('------------------------');
-	web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
-		if (unlocked) {
-			contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
-				betPriceSet = false;
-				const logTime = moment().tz("Europe/Belgrade").format();
-				console.log(logTime);
-				console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
-				console.log('------------------------');
-			});
+	if (coinbaseAddress != '') {
+		lastPayoutTime = currentTime.hour + ':' + currentTime.minute;
+		let winningBet;
+		if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) == 0) {
+			winningBet = 0;
+		} else if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) < 0) {
+			winningBet = 1;
+		} else {
+			winningBet = 2;
 		}
-	});
+		const logTime = moment().tz("Europe/Belgrade").format();
+		console.log(logTime);
+		console.log('Winning bet: ' + winningBet);
+		console.log('------------------------');
+		web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
+			if (unlocked) {
+				contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
+					betPriceSet = false;
+					const logTime = moment().tz("Europe/Belgrade").format();
+					console.log(logTime);
+					console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
+					console.log('------------------------');
+				});
+			}
+		});
+	}
 }
 
 /**
@@ -189,7 +194,8 @@ updateTime = () => {
 
 	// set node service update time
 	fs.readFile('ethData.json', function (err, data) {
-		if (data) {
+		try {
+			JSON.parse(data);
 			var json = JSON.parse(data);
 			ethData.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 			json.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
@@ -198,6 +204,8 @@ updateTime = () => {
 				const logTime = moment().tz("Europe/Belgrade").format();
 				// console.log(logTime + ': Data saved.');
 			});
+		} catch (e) {
+			console.log('ethData not valid: ' + e);
 		}
 	});
 
