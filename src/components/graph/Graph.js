@@ -35,12 +35,12 @@ class Graph extends React.Component {
                     datasets: [{
                         label: "ETH Price",
                         backgroundColor: 'rgba(50,255,50,0.1)',
-                        borderColor: 'rgba(50,255,50,0.5)',
-                        pointBackgroundColor: 'rgba(0,255,0,0.5)',
-                        pointBorderColor: 'rgba(0,255,0,0)',
+                        borderColor: 'rgba(65,105,225,0.5)',
+                        pointBackgroundColor: 'rgba(65,105,225,0.5)',
+                        pointBorderColor: 'rgba(65,105,225,0)',
                         pointBorderWidth: 1,
                         data: this.state.tempData,
-                        fill: true
+                        fill: false
                     }]
                 },
                 options: {
@@ -117,7 +117,7 @@ class Graph extends React.Component {
         return (
             <div className="col-sm-12">
                 <canvas
-                    style={{ width: 800, height: 300 }}
+                    style={{ width: 800, height: 450 }}
                     ref={node => (this.node = node)}
                 />
             </div>
