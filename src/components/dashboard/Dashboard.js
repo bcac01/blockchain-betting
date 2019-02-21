@@ -39,6 +39,7 @@ class Dashboard extends Component {
             inputValue: '',
             betAccepted: null,
             placedBet: '',
+            disablebutton: false,
             formErrors: {
             inputValue: ""
             }
@@ -62,8 +63,7 @@ class Dashboard extends Component {
      */
     resetBet = () => {
         sessionStorage.setItem('type', '');
-        const { click } = this.props;
-        click();
+        this.changeBtnStateFalse();
         this.setState({
             betAccepted: false,
             betting: false
@@ -75,7 +75,17 @@ class Dashboard extends Component {
             this.checkResults();
         }, 1000);
     }
-
+    
+    changeBtnStateTrue = () =>{
+        this.setState({
+            disablebutton : true
+        })
+    }
+    changeBtnStateFalse = () =>{
+        this.setState({
+            disablebutton : false
+        })
+    }
     /**
      * Check for bet results
      */
@@ -91,93 +101,101 @@ class Dashboard extends Component {
     }
 
     handleBet = (e) => {
-        //disable click on elements until bet accepted
-        const { click } = this.props;
-        click();
-        this.setState({
-            betting: true  
-        })
-        //do not proceed if the field is empty, set inline message
-        let formErrors = { ...this.state.formErrors };
-        if (this.state.inputValue === '') {
-            formErrors.inputValue ="Please enter a bet value";
-            this.setState({ 
-                formErrors,
-            });
-            click();
+        if (this.state.inputValue >= 0.005)
+        {
+            //disable click on elements until bet accepted
+            this.changeBtnStateTrue();
+            console.log(this.state.disablebutton);
             this.setState({
-                betting: false  
+                betting: true  
             })
-            return;
-        } else {
-            // check which button is pressed and save state
-            const { name } = e.target;
-            const placedBetNumber = name === "bet up" ? 2 : 1;
-            this.setState({ placedBet: name });
-
-            // check if user is logged in
-            if ((sessionStorage.getItem('address') === '0x0000000000000000000000000000000000000000') || (sessionStorage.getItem('address') === '') || (sessionStorage.getItem('address') === null)) {
-                alert('You are not logged in');
-                this.resetBet();
+            //do not proceed if the field is empty, set inline message
+            let formErrors = { ...this.state.formErrors };
+            if (this.state.inputValue === '') {
+                formErrors.inputValue ="Please enter a bet value";
+                this.setState({ 
+                    formErrors,
+                });
+                this.changeBtnStateFalse();
+                this.setState({
+                    betting: false  
+                })
                 return;
             } else {
-                // check if time is right
-                axios.get('/update_service/ethData.json').then(response => {
-                    if (moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())) < 0) {
-                        alert("You've missed your chance, time's up :(");
-                        this.resetBet();
-                        return;
-                    } else {
-                        // check if user have enough funds
-                        web3.eth.getBalance(sessionStorage.getItem('address')).then(balance => {
-                            console.log(web3.utils.fromWei(balance,'ether'));
-                            console.log(this.state.inputValue);
-                            if (web3.utils.fromWei(balance,'ether') < this.state.inputValue) {
-                                alert('You don\'t have enough funds');
-                                this.resetBet();
-                                return;
-                            } else {
-                                // unlock user's address
-                                contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
-                                    web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 120).then(() => {
-                                        // place bet 
-                                        contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: "300000" , gasPrice: "15000000000" })
-                                        .then(receipt => {
-                                            if (receipt) {
-                                                sessionStorage.setItem('type', this.state.inputValue);
-                                                this.setState({
-                                                    betAccepted: true,
-                                                    betting: false
-                                                });
-                                                // save bet to local storage
-                                                let myBets;
-                                                if (localStorage.getItem('bets')) {
-                                                    myBets = JSON.parse(localStorage.getItem('bets'));
+                // check which button is pressed and save state
+                const { name } = e.target;
+                const placedBetNumber = name === "bet up" ? 2 : 1;
+                this.setState({ placedBet: name });
+
+                // check if user is logged in
+                if ((sessionStorage.getItem('address') === '0x0000000000000000000000000000000000000000') || (sessionStorage.getItem('address') === '') || (sessionStorage.getItem('address') === null)) {
+                    alert('You are not logged in');
+                    this.resetBet();
+                    return;
+                } else {
+                    // check if time is right
+                    axios.get('/update_service/ethData.json').then(response => {
+                        if (moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())) < 0) {
+                            alert("You've missed your chance, time's up :(");
+                            this.resetBet();
+                            return;
+                        } else {
+                            // check if user have enough funds
+                            web3.eth.getBalance(sessionStorage.getItem('address')).then(balance => {
+                                console.log(web3.utils.fromWei(balance,'ether'));
+                                console.log(parseFloat(this.state.inputValue.replace(",", ".")))
+                                if (web3.utils.fromWei(balance,'ether') < parseFloat(this.state.inputValue.replace(",", "."))) {
+                                    alert('You don\'t have enough funds');
+                                    this.resetBet();
+                                    return;
+                                } else {
+                                    // unlock user's address
+                                    contractInstance.methods.getAddressPass(sessionStorage.getItem('address')).call({ from: coinbaseAddress }).then((addressPass) => {
+                                        web3.eth.personal.unlockAccount(sessionStorage.getItem('address'), addressPass, 120).then(() => {
+                                            // place bet 
+                                            contractInstance.methods.purchaseBet(placedBetNumber).send({ from: sessionStorage.getItem('address'), value: web3.utils.toWei(this.state.inputValue, "ether"), gas: "300000" , gasPrice: "15000000000" })
+                                            .then(receipt => {
+                                                if (receipt) {
+                                                    sessionStorage.setItem('type', this.state.inputValue);
+                                                    this.setState({
+                                                        betAccepted: true,
+                                                        betting: false
+                                                    });
+                                                    // save bet to local storage
+                                                    let myBets;
+                                                    if (localStorage.getItem('bets')) {
+                                                        myBets = JSON.parse(localStorage.getItem('bets'));
+                                                    } else {
+                                                        myBets = [];
+                                                    }
+                                                    myBets.push({
+                                                        'betType': placedBetNumber,
+                                                        'betTime': new Date()
+                                                    });
+                                                    localStorage.setItem('bets', JSON.stringify(myBets));
+                                                    this.changeBtnStateFalse();
+                                                    console.log(this.state.disablebutton);
+                                                    console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                                 } else {
-                                                    myBets = [];
+                                                    this.resetBet();
                                                 }
-                                                myBets.push({
-                                                    'betType': placedBetNumber,
-                                                    'betTime': new Date()
-                                                });
-                                                localStorage.setItem('bets', JSON.stringify(myBets));
-                                                global.disablebutton = false;
-                                                console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
-                                            } else {
+                                            }).catch((err) => {
                                                 this.resetBet();
-                                            }
-                                        }).catch((err) => {
-                                            this.resetBet();
-                                            console.log("Failed with error: " + err);
-                                          });
+                                                console.log("Failed with error: " + err);
+                                            });
+                                        });
+                                    
                                     });
-                                
-                                });
-                            }
-                        });
-                    }
-                });
+                                }
+                            });
+                        }
+                    });
+                }
             }
+        }
+        else
+        {
+            alert('Ne mozes da se kladis Veljo stipso')
         }
     }
 
@@ -210,7 +228,7 @@ class Dashboard extends Component {
                 </div>
                 <div className="row">
                     <div className="col-sm-3">
-                        <button disabled={global.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
+                        <button disabled={this.state.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-6">
                     <input onChange={this.updateValue} className={formErrors.inputValue.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)"/>   
@@ -220,7 +238,7 @@ class Dashboard extends Component {
                         )}
                     </div>
                     <div className="col-sm-3">
-                        <button disabled={global.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
+                        <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
                     </div>
                 </div>
                 {

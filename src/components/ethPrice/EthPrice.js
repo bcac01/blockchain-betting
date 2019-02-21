@@ -29,7 +29,8 @@ class EthPrice extends Component {
             walletAddress: '',
             totalBetAmount: 0,
             totalBetUpAmount: 0,
-            totalBetDownAmount: 0
+            totalBetDownAmount: 0,
+            QRvisible: false,
         }
     }
 
@@ -58,6 +59,13 @@ class EthPrice extends Component {
         });
     }
 
+
+    /* QR show - hide */
+    QRcodeShowHide = () => {
+        this.setState({
+            QRvisible: !this.state.QRvisible
+        })
+    }
     componentDidMount(){
         this.timer = setInterval( () => {
             axios.get('/update_service/ethData.json').then(response => {
@@ -111,7 +119,29 @@ class EthPrice extends Component {
                 </div>
                 <div className="col-sm-12">
                     <h1 className="myWallet">{this.state.walletAddress}</h1>
+                    {
+                        !this.state.QRvisible?
+                    <div className="btn-group dropdown mb-1">
+                        <button type="button" className="btn btn-success dropdown-toggle" 
+                        onClick={this.QRcodeShowHide}>
+                            Show QR code&nbsp;&nbsp; 
+                        </button>
+                    </div>
+                    :null
+                    }
+                    {
+                        this.state.QRvisible?
+                    <div className="btn-group dropup mb-1">
+                        <button type="button" className="btn btn-secondary dropdown-toggle" 
+                        onClick={this.QRcodeShowHide}>
+                            Hide QR code&nbsp;&nbsp;
+                        </button>
+                    </div>
+                    :null
+                    }
                 </div>
+                {
+                    this.state.QRvisible?
                 <div className="col-sm-12 col-centered">
                     <div className="qrdiv col-sm-12 col-centered">
                         <QRCode 
@@ -125,6 +155,8 @@ class EthPrice extends Component {
                         />
                     </div>
                 </div>
+                :null
+                }
                 <div className="col float-center myWallet">
                     <h2 className="float-center">Current balance : {this.state.currentBalance} - ETH</h2>
                 </div>
