@@ -10,7 +10,7 @@
 
 /*dark background to support form theme*/
 body{
-  background:url(http://subtlepatterns2015.subtlepatterns.netdna-cdn.com/patterns/dark_wall.png);
+  background:url('./img/dark_wall.png');
 }
 
 h1{
