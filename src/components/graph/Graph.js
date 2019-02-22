@@ -59,8 +59,8 @@ class Graph extends React.Component {
                         yAxes: [{
                             display: true,
                             ticks: {
-                                suggestedMin: minPrice - 0.1,
-                                suggestedMax: maxPrice + 0.1
+                                suggestedMin: minPrice - 0.05,
+                                suggestedMax: maxPrice + 0.05
                             },
                             scaleLabel: {
                                 display: true
@@ -103,8 +103,8 @@ class Graph extends React.Component {
             chart.data.datasets.forEach((dataset) => {
                 dataset.data = this.state.tempData;
             });
-            chart.options.scales.yAxes[0].ticks.suggestedMin = minPrice - 0.1;
-            chart.options.scales.yAxes[0].ticks.suggestedMax = maxPrice + 0.1;
+            chart.options.scales.yAxes[0].ticks.suggestedMin = minPrice - 0.05;
+            chart.options.scales.yAxes[0].ticks.suggestedMax = maxPrice + 0.05;
             chart.update();
         });
     }
