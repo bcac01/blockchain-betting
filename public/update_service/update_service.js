@@ -9,6 +9,7 @@ const nodeUrl = require('../../src/eth-node-config'),
 	contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
 
 let coinbaseAddress = '',
+	availableAddresses = 0,
 	creatingAddress = false,
 	currentTime = {
 		'year': '',
@@ -67,7 +68,11 @@ fs.writeFile("ethHistory.json", '[]', function (err) {
 createNewAddress = () => {
 	if (coinbaseAddress != '') {
 		contractInstance.methods.getAvailableAddresses().call().then(receipt => {
-			const availableAddresses = receipt[0];
+			if (typeof receipt === 'object') {
+				availableAddresses = parseInt(receipt.number);
+			} else {
+				availableAddresses = parseInt(receipt);
+			}
 			if (availableAddresses < 50 && !creatingAddress) {
 				creatingAddress = true;
 				console.log('Not enough addresses in the pool, creating new address.');
