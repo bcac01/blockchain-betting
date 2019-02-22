@@ -5,7 +5,6 @@ import moment from 'moment';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
 
-
 /**
  * Create web3 instance
  */
@@ -32,30 +31,61 @@ web3.eth.getCoinbase().then(result => {
 
 class Dashboard extends Component {
 
-    constructor(dashboardProps) {
-        super(dashboardProps)  
-        this.state = {
+   state = {
             betting: false,
             inputValue: '',
             betAccepted: null,
             placedBet: '',
             disablebutton: false,
             formErrors: {
-            inputValue: ""
-            }
+            inputValueE: ""
+            },
+            possibleUpWinning : 0,
+            possibleDownWinning : 0,
+            upCoeficient : 0,
+            downCoeficient : 0,
+            realBetAmount : 0,
+            betam: 0
         }
-    }
     
+    //get possible winning
+    getPossibleWinning = () => { 
+        if (parseFloat(this.state.inputValue.replace(",", ".")) !== 0)
+        {
+            this.setState({
+                realBetAmount: (parseFloat(global.totalBetAmount) + parseFloat(this.state.inputValue.replace(",", ".")))
+                - parseFloat(global.totalBetDownAmount) * 10 / 100,
+                downCoeficient : parseFloat(this.state.realBetAmount) 
+                / (parseFloat(global.totalBetUpAmount) + parseFloat(this.state.inputValue.replace(",", "."))),
+                possibleDownWinning : parseFloat(this.state.inputValue.replace(",", ".")) * parseFloat(this.state.downCoeficient),
+            });
+            console.log(global.totalBetAmount);
+            console.log(global.totalBetDownAmount);
+            console.log('realbetam'+this.state.realBetAmount);
+            console.log('downcoef'+this.state.downCoeficient);
+            console.log('possibleDownWining'+this.state.possibleDownWinning);
+            console.log(this.state.inputValue);
+        } 
+    }
     // update value state
     updateValue = (e) => {
         e.preventDefault();
 
         const { value } = e.target;
-        let formErrors = { ...this.state.formErrors };
-    
-        formErrors.inputValue = value.length === 0 ? "Please enter a bet value" : "";
-    
-        this.setState({ formErrors, inputValue: value });
+        console.log(e.target)
+        let formErrors = this.state.formErrors ;
+
+        formErrors.inputValueE = value.length === 0 ? "Please enter a bet value" : "";
+        
+        this.state.inputValue = value
+
+
+        console.log(this.state)
+        
+        this.setState({ 
+        formErrors,
+        });
+        this.getPossibleWinning();
     }
 
     /**
@@ -110,9 +140,9 @@ class Dashboard extends Component {
                 betting: true  
             })
             //do not proceed if the field is empty, set inline message
-            let formErrors = { ...this.state.formErrors };
+            let formErrors = this.state.formErrors ;
             if (this.state.inputValue === '') {
-                formErrors.inputValue ="Please enter a bet value";
+                formErrors.inputValueE ="Please enter a bet value";
                 this.setState({ 
                     formErrors,
                 });
@@ -228,16 +258,27 @@ class Dashboard extends Component {
                 </div>
                 <div className="row">
                     <div className="col-sm-3">
+                        {
+                            parseFloat(this.state.inputValue.replace(",",".")) > 0 
+                            && this.state.inputValue !== ''?
+                                <p className="possibleWin">LUDNICA</p>
+                            :null
+                        }
                         <button disabled={this.state.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-6">
-                    <input onChange={this.updateValue} className={formErrors.inputValue.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)"/>   
+                    <input name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
                     <p><sup>* transaction fee is 0.00195 eth</sup></p>
-                    {formErrors.inputValue.length > 0 && (
-                        <p className="errorMessage">{formErrors.inputValue}</p>
+                    {formErrors.inputValueE.length > 0 && (
+                        <p className="errorMessage">{formErrors.inputValueE}</p>
                         )}
                     </div>
-                    <div className="col-sm-3">
+                    <div className="col-sm-3">{
+                            parseFloat(this.state.inputValue.replace(",",".")) > 0 
+                            && this.state.inputValue !== ''?
+                                <p className="possibleWin">LUDNICA</p>
+                            :null
+                        }
                         <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
                     </div>
                 </div>

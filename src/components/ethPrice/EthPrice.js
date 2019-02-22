@@ -5,6 +5,11 @@ import nodeUrl from '../../eth-node-config.json';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
 var QRCode = require('qrcode.react');
 
+
+global.totalBetAmount= 0;
+global.totalBetUpAmount= 0;
+global.totalBetDownAmount = 0;
+
 const web3 = new Web3(nodeUrl.url);
 
 /**
@@ -27,9 +32,9 @@ class EthPrice extends Component {
             priceDifference: 0,
             currentBalance: '',
             walletAddress: '',
-            totalBetAmount: 0,
-            totalBetUpAmount: 0,
-            totalBetDownAmount: 0,
+            //totalBetAmount: 0,
+            //totalBetUpAmount: 0,
+            //totalBetDownAmount: 0,
             QRvisible: false,
         }
     }
@@ -51,11 +56,9 @@ class EthPrice extends Component {
     getTotalBetAmount = () => {
         contractInstance.methods.BetStatistics().call()
         .then((response) => {
-             this.setState({
-                 totalBetAmount: web3.utils.fromWei(response[0],'ether'),
-                 totalBetDownAmount: web3.utils.fromWei(response[1],'ether'),
-                 totalBetUpAmount: web3.utils.fromWei(response[2],'ether'),
-             });
+                 global.totalBetAmount= web3.utils.fromWei(response[0],'ether');
+                 global.totalBetDownAmount= web3.utils.fromWei(response[1],'ether');
+                 global.totalBetUpAmount= web3.utils.fromWei(response[2],'ether');
         });
     }
 
@@ -164,15 +167,15 @@ class EthPrice extends Component {
             <div className="row">
                 <div className="col-sm-4">
                     <h1>Bet up amount</h1>
-                    <h2>{this.state.totalBetUpAmount} -ETH</h2>
+                    <h2>{global.totalBetUpAmount} -ETH</h2>
                 </div>
                 <div className="col-sm-4">
                     <h1>Total Bet amount</h1>
-                    <h2>{this.state.totalBetAmount} -ETH</h2>
+                    <h2>{global.totalBetAmount} -ETH</h2>
                 </div>
                 <div className="col-sm-4">
                     <h1>Bet down amount</h1>
-                    <h2>{this.state.totalBetDownAmount} -ETH</h2>
+                    <h2>{global.totalBetDownAmount} -ETH</h2>
                 </div>
             </div>
         </div>
