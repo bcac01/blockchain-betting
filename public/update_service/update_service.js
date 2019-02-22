@@ -67,8 +67,8 @@ fs.writeFile("ethHistory.json", '[]', function (err) {
 createNewAddress = () => {
 	if (coinbaseAddress != '') {
 		contractInstance.methods.getAvailableAddresses().call().then(receipt => {
-			const availableAddresses = receipt;
-			if (receipt < 50 && !creatingAddress) {
+			const availableAddresses = receipt[0];
+			if (availableAddresses < 50 && !creatingAddress) {
 				creatingAddress = true;
 				console.log('Not enough addresses in the pool, creating new address.');
 				const pass = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
