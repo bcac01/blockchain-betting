@@ -79,10 +79,10 @@ createNewAddress = () => {
 							web3.eth.personal.unlockAccount(newAddress, pass, 120).then(unlocked => {
 								if (unlocked) {
 									web3.eth.sendTransaction({ from: coinbaseAddress, to: newAddress, value: web3.utils.toWei("5", "ether") }).then(receipt => {
-										console.log('Created new address, gas spent: ' + receipt.gasUsed);
+										console.log('Created new address, gas spent: ' + parseInt(receipt.gasUsed));
 										contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 }).then(receipt => {
 											creatingAddress = false;
-											console.log('New address is now available, gas spent: ' + receipt.gasUsed);
+											console.log('New address is now available, gas spent: ' + parseInt(receipt.gasUsed));
 											console.log('Number of available addresses: ' + availableAddresses);
 										});
 									});
@@ -134,7 +134,7 @@ getEthPrice = () => {
 				// save eth price history
 				fs.readFile('ethHistory.json', function (err, data) {
 					let json = JSON.parse(data);
-					json.splice(0, json.length - 300);
+					json.splice(0, json.length - 150);
 					json.push(json_ethHistory);
 					const new_json = JSON.stringify(json);
 					fs.writeFile("ethHistory.json", new_json, function (err) {
@@ -167,11 +167,11 @@ distributeRewards = () => {
 		console.log('------------------------');
 		web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
 			if (unlocked) {
-				contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
+				contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 5000000 }).then(receipt => {
 					betPriceSet = false;
 					const logTime = moment().tz("Europe/Belgrade").format();
 					console.log(logTime);
-					console.log('Rewards distributed, gas spent: ' + receipt.gasUsed);
+					console.log('Rewards distributed, gas spent: ' + parseInt(receipt.gasUsed));
 					console.log('------------------------');
 				});
 			}
