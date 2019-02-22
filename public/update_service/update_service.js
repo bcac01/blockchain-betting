@@ -167,7 +167,7 @@ distributeRewards = () => {
 		console.log('------------------------');
 		web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
 			if (unlocked) {
-				contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 500000 }).then(receipt => {
+				contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 5000000 }).then(receipt => {
 					betPriceSet = false;
 					const logTime = moment().tz("Europe/Belgrade").format();
 					console.log(logTime);
