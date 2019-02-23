@@ -38,13 +38,13 @@ class EthPrice extends Component {
      * Get user balance
      */
     getUserBalance = () => {
-        web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=>
-        {       
+        web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=> {
             this.setState({
                 currentBalance: web3.utils.fromWei(balance,'ether')
             });
         })
     }
+    
     /**
      * Get total/up/down bet amount
      */
@@ -59,24 +59,32 @@ class EthPrice extends Component {
         });
     }
 
-
     /* QR show - hide */
     QRcodeShowHide = () => {
         this.setState({
             QRvisible: !this.state.QRvisible
         })
     }
+
+    /**
+     * Get eth data
+     */
+    getEthData = () => {
+        axios.get('/update_service/ethData.json').then(response => {
+            this.setState({
+                price: response.data.currentEthPrice,
+                betPrice: response.data.betEthPrice,
+                priceDifference: ((response.data.currentEthPrice /
+                    response.data.betEthPrice - 1) * 100).toFixed(2)
+            });
+        });
+    }
+
     componentDidMount(){
         this.timer = setInterval( () => {
-            axios.get('/update_service/ethData.json').then(response => {
-                this.setState({
-                    price: response.data.currentEthPrice,
-                    betPrice: response.data.betEthPrice,
-                    priceDifference: ((response.data.currentEthPrice / 
-                    response.data.betEthPrice - 1) * 100).toFixed(2)
-                });
-            });
+            this.getEthData();
         }, 1000);
+        this.getEthData();
         this.getBalanceTimer = setInterval(() => {
             this.getUserBalance();
             this.getTotalBetAmount();

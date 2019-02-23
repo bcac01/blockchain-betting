@@ -24,3 +24,4 @@ yarn-error.log*
 src/eth-node-config.json
 public/update_service/ethHistory.json
 public/update_service/ethData.json
+public/update_service/serviceTime.json

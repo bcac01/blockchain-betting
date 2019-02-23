@@ -94,7 +94,7 @@ class App extends Component {
   }
 
   checkService = () => {
-    axios.get('/update_service/ethData.json').then(response => {
+    axios.get('/update_service/serviceTime.json').then(response => {
       if (moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') > 5) {
         this.setState({
           showSignin: false,

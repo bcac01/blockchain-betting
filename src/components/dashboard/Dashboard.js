@@ -29,7 +29,6 @@ web3.eth.getCoinbase().then(result => {
     coinbaseAddress = result;
 });
 
-
 class Dashboard extends Component {
 
     constructor(dashboardProps) {
@@ -41,8 +40,9 @@ class Dashboard extends Component {
             placedBet: '',
             disablebutton: false,
             formErrors: {
-            inputValue: ""
-            }
+                inputValue: ""
+            },
+            resultStatusMsg: false
         }
     }
     
@@ -72,7 +72,21 @@ class Dashboard extends Component {
 
     componentDidMount = () => {
         this.betResultTimer = setInterval(() => {
-            this.checkResults();
+            const currentTimeMinute = moment(new Date()).get('minute');
+            if (currentTimeMinute === 0 ||
+                currentTimeMinute === 10 ||
+                currentTimeMinute === 20 ||
+                currentTimeMinute === 30 ||
+                currentTimeMinute === 40 ||
+                currentTimeMinute === 50) {
+                    if (!this.state.resultStatusMsg) {
+                        this.checkResults();
+                    }
+            } else {
+                this.setState({
+                    resultStatusMsg: false
+                });
+            }
         }, 1000);
     }
     
@@ -86,6 +100,7 @@ class Dashboard extends Component {
             disablebutton : false
         })
     }
+
     /**
      * Check for bet results
      */
@@ -98,6 +113,21 @@ class Dashboard extends Component {
         //     console.log('no bets');
             
         // }
+        axios.get('/update_service/ethData.json').then(response => {
+            if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date(response.data.roundTime))) < 60000 && this.state.resultStatusMsg === false) {
+                this.setState({
+                    resultStatusMsg: true
+                });
+                let betWon;
+                if (response.data.lastWinningBet === 1)
+                    betWon = 'Down';
+                else if (response.data.lastWinningBet === 0)
+                    betWon = 'Tie'
+                else
+                    betWon = 'Up';
+                alert('Round has finished, the winning bet was: ' + betWon);
+            }
+        });
     }
 
     handleBet = (e) => {
