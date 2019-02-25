@@ -46,7 +46,6 @@ class Timer extends Component {
                     roundTime: response.data.roundTime,
                     roundTimeUpdated: true
                 });
-                console.log(this.state.roundTime);
             }
         });
     }
