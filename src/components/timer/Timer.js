@@ -98,7 +98,7 @@ class Timer extends Component {
                 (this.state.timeReal < 1000)?
                 <div className="row">
                     <div className="col-sm-6 column-in-center">
-                        <h2 className="h2Yellow">Wait until next round</h2>
+                        <h2 className="h2Yellow">New round starts in</h2>
                         <h2 className="h2Yellow">{moment(this.state.timeToNextRound).format('mm:ss')}</h2>
                     </div>
                 </div>
