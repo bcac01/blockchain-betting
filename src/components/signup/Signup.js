@@ -34,6 +34,8 @@ class Signup extends Component {
         disablebutton: false,
         successAlert: false,
         infoAlert: false,
+        dangerAlert: false,
+        dangerAlertUsername: false
     };
 
     // update username state
@@ -51,10 +53,26 @@ class Signup extends Component {
     }
 
     clearFields = () => {
+        this.setState({
+            inputUsername: '',
+            inputPassword: '',
+        })
             this.inputUsernameVal.value = "";
             this.inputPasswordVal.value = "";
     }
 
+    
+    dangerAlertState = () => {
+        this.setState({
+            dangerAlert :false
+        })
+    }
+
+    dangerAlertUsernameState = () => {
+        this.setState({
+            dangerAlertUsername :false
+        })
+    }
     /**
      * Create new account
      */
@@ -79,7 +97,12 @@ class Signup extends Component {
         });
         // check if there is empty field
         if (this.state.inputUsername === '' || this.state.inputPassword === '') {
-            alert('Username or password field is empty');
+            this.setState({
+                dangerAlert: true,
+                dangerAlertUsername: false,
+                infoAlert: false,
+                successAlert: false,
+            })
             return;
         }
         //disable click on elements until sign up return value
@@ -101,14 +124,18 @@ class Signup extends Component {
                                     disablebutton: !this.state.disablebutton
                                 });
                                 this.setState({
-                                    successAlert: !this.state.successAlert
+                                    successAlert: !this.state.successAlert,
+                                    dangerAlert: false,
+                                    dangerAlertUsername: false,
                                 });
                                 this.clearFields();
                             }
                         );
                     } else {
                         this.setState({
-                            infoAlert: !this.state.infoAlert
+                            infoAlert: !this.state.infoAlert,
+                            dangerAlert: false,
+                            dangerAlertUsername: false,
                         });
                         // create new account that will be available for new users 
                         this.createNewAccount();
@@ -124,9 +151,9 @@ class Signup extends Component {
             } else {
                 this.clearFields();
                 this.setState({
-                    disablebutton: !this.state.disablebutton
+                    disablebutton: !this.state.disablebutton,
+                    dangerAlertUsername: true
                 });
-                alert('Username already exists.');
             }
         });
     }
@@ -179,6 +206,26 @@ class Signup extends Component {
                             <div className="alert alert-info col">
                             <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
                                 <strong>Info!</strong> Please wait until new address is genereted
+                            </div>
+                        </div>
+                    :null
+                }
+                {
+                    this.state.dangerAlert?
+                        <div className="row">
+                            <div className="alert alert-danger col">
+                            <a href="#0" onClick={this.dangerAlertState} className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                Please insert username and password
+                            </div>
+                        </div>
+                    :null
+                }
+                {
+                    this.state.dangerAlertUsername?
+                        <div className="row">
+                            <div className="alert alert-danger col">
+                            <a href="#0" onClick={this.dangerAlertUsernameState} className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                Username already exists
                             </div>
                         </div>
                     :null

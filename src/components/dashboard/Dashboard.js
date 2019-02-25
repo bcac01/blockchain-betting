@@ -60,15 +60,26 @@ class Dashboard extends Component {
             }
             else
             {
-                this.state.realBetAmount= parseFloat(global.totalBetAmount) 
+                this.setState({
+                realBetAmount : parseFloat(global.totalBetAmount) 
                 + parseFloat(this.state.inputValue.replace(",", "."))
-                - (parseFloat(global.totalBetUpAmount) * 10 / 100);
-                this.state.downCoeficient = parseFloat(this.state.realBetAmount) 
+                - (parseFloat(global.totalBetUpAmount) * 10 / 100),
+                downCoeficient : parseFloat(this.state.realBetAmount) 
                 / (parseFloat(global.totalBetDownAmount)
-                + parseFloat(this.state.inputValue.replace(",", ".")));
-                 this.state.possibleDownWinning = 
+                + parseFloat(this.state.inputValue.replace(",", "."))),
+                 possibleDownWinning : 
                  parseFloat(this.state.inputValue.replace(",", "."))
-                 * parseFloat(this.state.downCoeficient);
+                 * parseFloat(this.state.downCoeficient),
+                });
+                // this.state.realBetAmount= parseFloat(global.totalBetAmount) 
+                // + parseFloat(this.state.inputValue.replace(",", "."))
+                // - (parseFloat(global.totalBetUpAmount) * 10 / 100);
+                // this.state.downCoeficient = parseFloat(this.state.realBetAmount) 
+                // / (parseFloat(global.totalBetDownAmount)
+                // + parseFloat(this.state.inputValue.replace(",", ".")));
+                //  this.state.possibleDownWinning = 
+                //  parseFloat(this.state.inputValue.replace(",", "."))
+                //  * parseFloat(this.state.downCoeficient);
             }
 
             //possible up bet
@@ -221,21 +232,24 @@ class Dashboard extends Component {
 
                 // check if user is logged in
                 if ((sessionStorage.getItem('address') === '0x0000000000000000000000000000000000000000') || (sessionStorage.getItem('address') === '') || (sessionStorage.getItem('address') === null)) {
-                    alert('You are not logged in');
                     this.resetBet();
                     return;
                 } else {
                     // check if time is right
                     axios.get('/update_service/ethData.json').then(response => {
                         if (moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())) < 0) {
-                            alert("You've missed your chance, time's up :(");
+                            this.setState({
+                                betAccepted: false,
+                            })
                             this.resetBet();
                             return;
                         } else {
                             // check if user have enough funds
                             web3.eth.getBalance(sessionStorage.getItem('address')).then(balance => {
                                 if (web3.utils.fromWei(balance,'ether') < parseFloat(this.state.inputValue.replace(",", "."))) {
-                                    alert('You don\'t have enough funds');
+                                    this.setState({
+                                        betAccepted: false,
+                                    })
                                     this.resetBet();
                                     return;
                                 } else {
@@ -284,7 +298,9 @@ class Dashboard extends Component {
         }
         else
         {
-            alert('Ne mozes da se kladis Veljo stipso')
+            this.setState({
+                betAccepted: false
+            })
         }
     }
 
