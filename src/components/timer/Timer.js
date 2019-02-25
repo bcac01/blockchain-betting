@@ -21,12 +21,13 @@ class Timer extends Component {
         this.timer = setInterval(() => {
             this.updateTimes();
             const currentTimeMinute = moment(new Date()).get('minute');
-            if (currentTimeMinute === 1 ||
+            if ((currentTimeMinute === 1 ||
                 currentTimeMinute === 11 ||
                 currentTimeMinute === 21 ||
                 currentTimeMinute === 31 ||
                 currentTimeMinute === 41 ||
-                currentTimeMinute === 51) {
+                currentTimeMinute === 51) &&
+                !this.state.roundTimeUpdated) {
                     this.updateRoundTime();
             } else {
                 this.setState({
@@ -41,12 +42,17 @@ class Timer extends Component {
      */
     updateRoundTime = () => {
         axios.get('/update_service/ethData.json').then(response => {
-            if ((moment(new Date(response.data.roundTime)).diff(moment(new Date(this.state.roundTime))) !== 0) && !this.state.roundTimeUpdated) {
+            if ((moment(new Date(response.data.roundTime)).diff(moment(new Date(this.state.roundTime))) !== 0)) {
                 this.setState({
                     roundTime: response.data.roundTime,
                     roundTimeUpdated: true
                 });
             }
+            // filter bets storage
+            let filterdBets = JSON.parse(localStorage.getItem('bets')).filter(bet => {
+                return moment(new Date(response.data.roundTime)).diff(moment(new Date(bet.betTime))) <= 0;
+            });
+            localStorage.setItem('bets', JSON.stringify(filterdBets));
         });
     }
 
