@@ -167,8 +167,6 @@ class Dashboard extends Component {
             
         // }
         // get last round winning type
-        console.log('check for round result');
-        
         axios.get('/update_service/ethData.json').then(response => {
             if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date())) < 60000) {
                 this.setState({

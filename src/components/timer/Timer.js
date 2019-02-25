@@ -9,33 +9,62 @@ class Timer extends Component {
         this.state = {
             timeStart: '',
             timeEnd: '',
-            timeRemaining: ''
+            timeRemaining: '',
+            roundTime: '',
+            roundTimeUpdated: false
         }
     }
 
     componentDidMount() {
+        this.updateRoundTime();
         this.updateTimes();
         this.timer = setInterval(() => {
             this.updateTimes();
+            const currentTimeMinute = moment(new Date()).get('minute');
+            if (currentTimeMinute === 1 ||
+                currentTimeMinute === 11 ||
+                currentTimeMinute === 21 ||
+                currentTimeMinute === 31 ||
+                currentTimeMinute === 41 ||
+                currentTimeMinute === 51) {
+                    this.updateRoundTime();
+            } else {
+                this.setState({
+                    roundTimeUpdated: false
+                })
+            }
         }, 1000);
+    }
+
+    /**
+     * Get current round time
+     */
+    updateRoundTime = () => {
+        axios.get('/update_service/ethData.json').then(response => {
+            if ((moment(new Date(response.data.roundTime)).diff(moment(new Date(this.state.roundTime))) !== 0) && !this.state.roundTimeUpdated) {
+                this.setState({
+                    roundTime: response.data.roundTime,
+                    roundTimeUpdated: true
+                });
+                console.log(this.state.roundTime);
+            }
+        });
     }
 
     /**
      * Recalculate and update times every second
      */
     updateTimes = () => {
-        axios.get('/update_service/ethData.json').then(response => {
-            if (moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date())) > 0) {
-                this.setState({
-                    timeRemaining: moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())),
-                    timeReal: moment(new Date(response.data.roundTime)).add(9, 'minutes').diff(moment(new Date())),
-                    timeToNextRound: moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date()))
-                });
-            }
+        if (moment(new Date(this.state.roundTime)).add(10, 'minutes').diff(moment(new Date())) > 0) {
             this.setState({
-                timeStart: moment(new Date(response.data.roundTime)).format('DD/MMM/YYYY HH:mm'),
-                timeEnd: moment(new Date(response.data.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm')
+                timeRemaining: moment(new Date(this.state.roundTime)).add(8, 'minutes').diff(moment(new Date())),
+                timeReal: moment(new Date(this.state.roundTime)).add(9, 'minutes').diff(moment(new Date())),
+                timeToNextRound: moment(new Date(this.state.roundTime)).add(10, 'minutes').diff(moment(new Date()))
             });
+        }
+        this.setState({
+            timeStart: moment(new Date(this.state.roundTime)).format('DD/MMM/YYYY HH:mm'),
+            timeEnd: moment(new Date(this.state.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm')
         });
     }
 
