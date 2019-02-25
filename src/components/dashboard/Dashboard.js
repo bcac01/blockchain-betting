@@ -45,7 +45,7 @@ class Dashboard extends Component {
             upCoeficient : 0,
             downCoeficient : 0,
             realBetAmount : 0,
-            betam: 0
+            inVal: 0
         }
     
     //get possible winning
@@ -53,18 +53,32 @@ class Dashboard extends Component {
         if (parseFloat(this.state.inputValue.replace(",", ".")) !== 0)
         {
             this.setState({
-                realBetAmount: (parseFloat(global.totalBetAmount) + parseFloat(this.state.inputValue.replace(",", ".")))
+                inVal: parseFloat(this.state.inputValue.replace(",", ".")),
+                realBetAmount: parseFloat(global.totalBetAmount) 
+                + parseFloat(this.state.inVal)
                 - parseFloat(global.totalBetDownAmount) * 10 / 100,
                 downCoeficient : parseFloat(this.state.realBetAmount) 
-                / (parseFloat(global.totalBetUpAmount) + parseFloat(this.state.inputValue.replace(",", "."))),
-                possibleDownWinning : parseFloat(this.state.inputValue.replace(",", ".")) * parseFloat(this.state.downCoeficient),
+                / (parseFloat(global.totalBetUpAmount)
+                 + parseFloat(this.state.inVal)),
+                possibleDownWinning : parseFloat(this.state.inVal)
+                 * parseFloat(this.state.downCoeficient),
+                possibleDownWinning : parseFloat(this.state.possibleDownWinning) 
+                + parseFloat(this.state.inVal), 
+                upCoeficient: parseFloat(this.state.realBetAmount) 
+                / (parseFloat(global.totalBetDownAmount)
+                 + parseFloat(this.state.inVal)),
+                possibleUpWinning : parseFloat(this.state.inVal)
+                 * parseFloat(this.state.upCoeficient),
+                possibleUpWinning : parseFloat(this.state.possibleUpWinning) 
+                + parseFloat(this.state.inVal), 
+
             });
             console.log(global.totalBetAmount);
             console.log(global.totalBetDownAmount);
-            console.log('realbetam'+this.state.realBetAmount);
-            console.log('downcoef'+this.state.downCoeficient);
-            console.log('possibleDownWining'+this.state.possibleDownWinning);
-            console.log(this.state.inputValue);
+            console.log('realbetam '+this.state.realBetAmount);
+            console.log('downcoef '+this.state.downCoeficient);
+            console.log('possibleDownWining '+this.state.possibleDownWinning);
+            console.log(this.state.ilaternVal);
         } 
     }
     // update value state
@@ -72,15 +86,11 @@ class Dashboard extends Component {
         e.preventDefault();
 
         const { value } = e.target;
-        console.log(e.target)
         let formErrors = this.state.formErrors ;
 
         formErrors.inputValueE = value.length === 0 ? "Please enter a bet value" : "";
         
         this.state.inputValue = value
-
-
-        console.log(this.state)
         
         this.setState({ 
         formErrors,
@@ -261,7 +271,7 @@ class Dashboard extends Component {
                         {
                             parseFloat(this.state.inputValue.replace(",",".")) > 0 
                             && this.state.inputValue !== ''?
-                                <p className="possibleWin">LUDNICA</p>
+                                <p className="possibleWin">{this.state.possibleUpWinning}</p>
                             :null
                         }
                         <button disabled={this.state.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
@@ -276,7 +286,7 @@ class Dashboard extends Component {
                     <div className="col-sm-3">{
                             parseFloat(this.state.inputValue.replace(",",".")) > 0 
                             && this.state.inputValue !== ''?
-                                <p className="possibleWin">LUDNICA</p>
+                                <p className="possibleWin">{this.state.possibleDownWinning}</p>
                             :null
                         }
                         <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
