@@ -44,7 +44,6 @@ class Dashboard extends Component {
             upCoeficient : 0,
             downCoeficient : 0,
             realBetAmount : 0,
-            inVal: 0,
             resultStatusMsg: false
         }
     
@@ -52,33 +51,48 @@ class Dashboard extends Component {
     getPossibleWinning = () => { 
         if (parseFloat(this.state.inputValue.replace(",", ".")) !== 0)
         {
-            this.setState({
-                inVal: parseFloat(this.state.inputValue.replace(",", ".")),
-                realBetAmount: parseFloat(global.totalBetAmount) 
-                + parseFloat(this.state.inVal)
-                - parseFloat(global.totalBetDownAmount) * 10 / 100,
-                downCoeficient : parseFloat(this.state.realBetAmount) 
+            //possible down bet
+            if (parseFloat(global.totalBetUpAmount.replace(",",".")) === 0)
+            {
+                this.state.possibleDownWinning = 0 + 
+                parseFloat(this.state.inputValue.replace(",", "."));
+            }
+            else
+            {
+                this.state.realBetAmount= parseFloat(global.totalBetAmount) 
+                + parseFloat(this.state.inputValue.replace(",", "."))
+                - parseFloat(global.totalBetUpAmount) * 10 / 100;
+                this.state.downCoeficient = parseFloat(this.state.realBetAmount) 
                 / (parseFloat(global.totalBetUpAmount)
-                 + parseFloat(this.state.inVal)),
-                possibleDownWinning : parseFloat(this.state.inVal)
-                 * parseFloat(this.state.downCoeficient),
-                possibleDownWinning : parseFloat(this.state.possibleDownWinning) 
-                + parseFloat(this.state.inVal), 
-                upCoeficient: parseFloat(this.state.realBetAmount) 
-                / (parseFloat(global.totalBetDownAmount)
-                 + parseFloat(this.state.inVal)),
-                possibleUpWinning : parseFloat(this.state.inVal)
-                 * parseFloat(this.state.upCoeficient),
-                possibleUpWinning : parseFloat(this.state.possibleUpWinning) 
-                + parseFloat(this.state.inVal), 
+                 + parseFloat(this.state.inputValue.replace(",", ".")));
+                 this.state.possibleDownWinning = 
+                 parseFloat(this.state.inputValue.replace(",", "."))
+                 * parseFloat(this.state.downCoeficient);
+            }
 
-            });
+            //possible up bet
+            if (parseFloat(global.totalBetDownAmount.replace(",",".")) === 0)
+            {
+                this.state.possibleUpWinning = 0 +
+                parseFloat(this.state.inputValue.replace(",", "."));
+            }
+            else
+            {
+                this.state.realBetAmount = parseFloat(global.totalBetAmount) 
+                + parseFloat(this.state.inputValue.replace(",", "."))
+                - parseFloat(global.totalBetDownAmount) * 10 / 100;
+                this.state.upCoeficient = parseFloat(this.state.realBetAmount) 
+                / (parseFloat(global.totalBetDownAmount)
+                 + parseFloat(this.state.inputValue.replace(",", ".")));
+                this.state.possibleUpWinning = parseFloat(this.state.inputValue.replace(",", "."))
+                 * parseFloat(this.state.upCoeficient);
+            }
             console.log(global.totalBetAmount);
             console.log(global.totalBetDownAmount);
             console.log('realbetam '+this.state.realBetAmount);
             console.log('downcoef '+this.state.downCoeficient);
             console.log('possibleDownWining '+this.state.possibleDownWinning);
-            console.log(this.state.ilaternVal);
+            console.log(this.state.inputValue.replace(",", "."));
         } 
     }
     // update value state
@@ -89,12 +103,13 @@ class Dashboard extends Component {
         let formErrors = this.state.formErrors ;
 
         formErrors.inputValueE = value.length === 0 ? "Please enter a bet value" : "";
+        this.setState({ 
+            formErrors,
+        });
         
         this.state.inputValue = value
         
-        this.setState({ 
-        formErrors,
-        });
+        
         this.getPossibleWinning();
     }
 
@@ -307,7 +322,7 @@ class Dashboard extends Component {
                         <button disabled={this.state.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-6">
-                    <input name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
+                    <input id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
                     <p><sup>* transaction fee is 0.00195 eth</sup></p>
                     {formErrors.inputValueE.length > 0 && (
                         <p className="errorMessage">{formErrors.inputValueE}</p>

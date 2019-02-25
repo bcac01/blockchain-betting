@@ -286,3 +286,8 @@ input.error {
   float: none;
   margin: 0 auto;
 }
+
+#inputCenteredText
+{
+  text-align: center;
+}
