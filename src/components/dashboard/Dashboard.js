@@ -41,8 +41,7 @@ class Dashboard extends Component {
             disablebutton: false,
             formErrors: {
                 inputValue: ""
-            },
-            resultStatusMsg: false
+            }
         }
     }
     
@@ -73,18 +72,22 @@ class Dashboard extends Component {
     componentDidMount = () => {
         this.betResultTimer = setInterval(() => {
             const currentTimeMinute = moment(new Date()).get('minute');
-            if (currentTimeMinute === 0 ||
+            const currentTimeSecond = moment(new Date()).get('second');
+            if ((currentTimeMinute === 0 ||
                 currentTimeMinute === 10 ||
                 currentTimeMinute === 20 ||
                 currentTimeMinute === 30 ||
                 currentTimeMinute === 40 ||
-                currentTimeMinute === 50) {
-                    if (!this.state.resultStatusMsg)
+                currentTimeMinute === 50) &&
+                currentTimeSecond > 5) {
+                    if (!sessionStorage.setItem('resultStatusMsg')) {
                         this.checkResults();
+                    }
             } else {
-                this.setState({
-                    resultStatusMsg: false
-                });
+                // this.setState({
+                //     resultStatusMsg: false
+                // });
+                sessionStorage.setItem('resultStatusMsg', false);
             }
         }, 1000);
     }
@@ -118,9 +121,7 @@ class Dashboard extends Component {
         // }
         axios.get('/update_service/ethData.json').then(response => {
             if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date(response.data.roundTime))) < 60000 && this.state.resultStatusMsg === false) {
-                this.setState({
-                    resultStatusMsg: true
-                });
+                sessionStorage.setItem('resultStatusMsg', true);
                 let betWon;
                 if (response.data.lastWinningBet === 1)
                     betWon = 'Down';
