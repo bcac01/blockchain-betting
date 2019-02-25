@@ -54,17 +54,16 @@ class Dashboard extends Component {
             //possible down bet
             if (parseFloat(global.totalBetUpAmount.replace(",",".")) === 0)
             {
-                this.state.possibleDownWinning = 0 + 
-                parseFloat(this.state.inputValue.replace(",", "."));
+                this.state.possibleDownWinning = 0;
             }
             else
             {
                 this.state.realBetAmount= parseFloat(global.totalBetAmount) 
                 + parseFloat(this.state.inputValue.replace(",", "."))
-                - parseFloat(global.totalBetUpAmount) * 10 / 100;
+                - (parseFloat(global.totalBetUpAmount) * 10 / 100);
                 this.state.downCoeficient = parseFloat(this.state.realBetAmount) 
-                / (parseFloat(global.totalBetUpAmount)
-                 + parseFloat(this.state.inputValue.replace(",", ".")));
+                / (parseFloat(global.totalBetDownAmount)
+                + parseFloat(this.state.inputValue.replace(",", ".")));
                  this.state.possibleDownWinning = 
                  parseFloat(this.state.inputValue.replace(",", "."))
                  * parseFloat(this.state.downCoeficient);
@@ -73,8 +72,7 @@ class Dashboard extends Component {
             //possible up bet
             if (parseFloat(global.totalBetDownAmount.replace(",",".")) === 0)
             {
-                this.state.possibleUpWinning = 0 +
-                parseFloat(this.state.inputValue.replace(",", "."));
+                this.state.possibleUpWinning = 0;
             }
             else
             {
@@ -82,17 +80,11 @@ class Dashboard extends Component {
                 + parseFloat(this.state.inputValue.replace(",", "."))
                 - parseFloat(global.totalBetDownAmount) * 10 / 100;
                 this.state.upCoeficient = parseFloat(this.state.realBetAmount) 
-                / (parseFloat(global.totalBetDownAmount)
+                / (parseFloat(global.totalBetUpAmount)
                  + parseFloat(this.state.inputValue.replace(",", ".")));
                 this.state.possibleUpWinning = parseFloat(this.state.inputValue.replace(",", "."))
                  * parseFloat(this.state.upCoeficient);
             }
-            console.log(global.totalBetAmount);
-            console.log(global.totalBetDownAmount);
-            console.log('realbetam '+this.state.realBetAmount);
-            console.log('downcoef '+this.state.downCoeficient);
-            console.log('possibleDownWining '+this.state.possibleDownWinning);
-            console.log(this.state.inputValue.replace(",", "."));
         } 
     }
     // update value state
@@ -190,7 +182,6 @@ class Dashboard extends Component {
         {
             //disable click on elements until bet accepted
             this.changeBtnStateTrue();
-            console.log(this.state.disablebutton);
             this.setState({
                 betting: true  
             })
@@ -227,8 +218,6 @@ class Dashboard extends Component {
                         } else {
                             // check if user have enough funds
                             web3.eth.getBalance(sessionStorage.getItem('address')).then(balance => {
-                                console.log(web3.utils.fromWei(balance,'ether'));
-                                console.log(parseFloat(this.state.inputValue.replace(",", ".")))
                                 if (web3.utils.fromWei(balance,'ether') < parseFloat(this.state.inputValue.replace(",", "."))) {
                                     alert('You don\'t have enough funds');
                                     this.resetBet();
@@ -259,7 +248,6 @@ class Dashboard extends Component {
                                                     });
                                                     localStorage.setItem('bets', JSON.stringify(myBets));
                                                     this.changeBtnStateFalse();
-                                                    console.log(this.state.disablebutton);
                                                     console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                                 } else {
                                                     this.resetBet();
@@ -316,12 +304,18 @@ class Dashboard extends Component {
                         {
                             parseFloat(this.state.inputValue.replace(",",".")) > 0 
                             && this.state.inputValue !== ''?
-                                <p className="possibleWin">{this.state.possibleUpWinning}</p>
+                                <p className="possibleWin">{this.state.possibleUpWinning.toFixed(10)}</p>
                             :null
                         }
                         <button disabled={this.state.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-6">
+                    {
+                            parseFloat(this.state.inputValue.replace(",",".")) > 0 
+                            && this.state.inputValue !== ''?
+                                <p className="possibleWin">&#8592;  possible win  &#8594;</p>
+                            :null
+                    }
                     <input id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
                     <p><sup>* transaction fee is 0.00195 eth</sup></p>
                     {formErrors.inputValueE.length > 0 && (
@@ -331,7 +325,7 @@ class Dashboard extends Component {
                     <div className="col-sm-3">{
                             parseFloat(this.state.inputValue.replace(",",".")) > 0 
                             && this.state.inputValue !== ''?
-                                <p className="possibleWin">{this.state.possibleDownWinning}</p>
+                                <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
                             :null
                         }
                         <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
