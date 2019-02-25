@@ -178,4 +178,11 @@ contract BettingApp {
     function BetStatistics() public view returns (uint _totalBetAmount, uint _totalBetDownAmount, uint _totalBetUpAmount) {
         return (totalBetAmount,totalBetDownAmount,totalBetUpAmount);
     }
+
+    // check if there are players before reward distribution
+    function hasPlayers () public view returns (bool){
+        require(msg.sender == contractOwner);
+        if (totalBetAmount > 0)
+            return true;
+    }
 }
