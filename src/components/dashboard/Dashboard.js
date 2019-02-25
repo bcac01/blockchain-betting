@@ -196,6 +196,12 @@ class Dashboard extends Component {
         })
     }
 
+    hideBetStatusMsg = () => {
+        this.setState({
+            betAccepted: null
+        })
+    }
+
     handleBet = (e) => {
         if (this.state.inputValue >= 0.005)
         {
@@ -312,7 +318,7 @@ class Dashboard extends Component {
                     this.state.showRoundResult ?
                         <div className="col">
                             <div className="alert alert-info alert-dismissible">
-                                <a href="#0" className="close" data-dismiss="alert" aria-label="close" onClick={this.hideRoundResultMsg}>&times;</a>
+                                <a href="#0" className="close" onClick={this.hideRoundResultMsg}>&times;</a>
                                 Round has finished, the winning bet was: {this.state.roundResult}
                             </div>
                         </div>
@@ -322,7 +328,7 @@ class Dashboard extends Component {
                     this.state.betAccepted ?
                         <div className="col">
                             <div className="alert alert-success alert-dismissible">
-                            <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <a href="#0" className="close" onClick={this.hideBetStatusMsg}>&times;</a>
                                 Thank you for your bet.
                             </div> 
                         </div>    
@@ -332,7 +338,7 @@ class Dashboard extends Component {
                     !this.state.betAccepted && this.state.betAccepted != null ? 
                         <div className="col">
                             <div className="alert alert-danger alert-dismissible">
-                            <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
+                                <a href="#0" className="close" onClick={this.hideBetStatusMsg}>&times;</a>
                                 Your bet was rejected.
                             </div>
                         </div>
