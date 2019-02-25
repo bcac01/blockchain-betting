@@ -14,54 +14,29 @@ class Timer extends Component {
     }
 
     componentDidMount() {
+        this.updateTimes();
+        this.timer = setInterval(() => {
+            this.updateTimes();
+        }, 1000);
+    }
 
-        let fixedRemainingTime = 0;
-        let fixedRealTime = 0;
-        let fixedTimeToNextRound = 0;
+    /**
+     * Recalculate and update times every second
+     */
+    updateTimes = () => {
         axios.get('/update_service/ethData.json').then(response => {
-
-            /**
-             * Set remaining time to 0 in last 10 minutes of the round
-             */
-            if (moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date())) > 0)
-            {
-                fixedRemainingTime = moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date()));
-                fixedRealTime = moment(new Date(response.data.roundTime)).add(9, 'minutes').diff(moment(new Date()));
-                fixedTimeToNextRound = moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date()));
+            if (moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date())) > 0) {
+                this.setState({
+                    timeRemaining: moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date())),
+                    timeReal: moment(new Date(response.data.roundTime)).add(9, 'minutes').diff(moment(new Date())),
+                    timeToNextRound: moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date()))
+                });
             }
-                
             this.setState({
                 timeStart: moment(new Date(response.data.roundTime)).format('DD/MMM/YYYY HH:mm'),
-                timeEnd: moment(new Date(response.data.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm'),
-                timeRemaining: fixedRemainingTime,
-                timeReal: fixedRealTime,
-                timeToNextRound: fixedTimeToNextRound,
+                timeEnd: moment(new Date(response.data.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm')
             });
-            
         });
-
-        /**
-         * Recalculate and update times every second
-         */
-        this.timer = setInterval(() => {
-            axios.get('/update_service/ethData.json').then(response => {
-                if (moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date())) > 0)
-                {
-                    fixedRemainingTime = moment(new Date(response.data.roundTime)).add(8, 'minutes').diff(moment(new Date()));
-                    fixedRealTime = moment(new Date(response.data.roundTime)).add(9, 'minutes').diff(moment(new Date()));
-                    fixedTimeToNextRound = moment(new Date(response.data.roundTime)).add(10, 'minutes').diff(moment(new Date()));
-                }
-                    
-                
-                    this.setState({
-                    timeStart: moment(new Date(response.data.roundTime)).format('DD/MMM/YYYY HH:mm'),
-                    timeEnd: moment(new Date(response.data.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm'),
-                    timeRemaining: fixedRemainingTime,
-                    timeReal: fixedRealTime,
-                    timeToNextRound: fixedTimeToNextRound,
-                });
-            });
-        }, 1000);
     }
 
     componentWillUnmount = () => {

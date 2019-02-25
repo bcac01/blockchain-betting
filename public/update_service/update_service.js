@@ -19,36 +19,48 @@ let coinbaseAddress = '',
 		'minute': '',
 		'second': ''
 	},
-	lastPayoutTime = '',
 	betPriceSet = false,
 	ethData = {
 		'currentEthPrice': '',
 		'betEthPrice': '',
 		'roundTime': '',
-		'updateTime': ''
+		'lastWinningBet': 0,
+		'lastPayoutTime': ''
 	},
-	json_ethHistory = {};
+	json_ethHistory = {},
+	serviceTime = {
+		'updateTime': ''
+	};
 
 /**
  * Get coinbase address
  */
 web3.eth.getCoinbase().then(result => {
 	coinbaseAddress = result;
+}).catch(err => {
+	const logTime = moment().tz("Europe/Belgrade").format();
+	console.log(logTime + ': ' + err);
+	console.log('------------------------');
 });
 
 /**
- * Set initial eth price values and round time when service is restarted
+ * Set initial eth data when service is restarted
  */
 fs.readFile('ethData.json', function (err, data) {
 	try {
 		JSON.parse(data);
-		var json = JSON.parse(data);
+		let json = JSON.parse(data);
 		ethData.currentEthPrice = json.currentEthPrice;
 		ethData.betEthPrice = json.betEthPrice;
 		ethData.roundTime = json.roundTime;
-		ethData.updateTime = json.updateTime;
-	} catch (e) {
-		console.log('ethData not valid: ' + e);
+		ethData.lastWinningBet = json.lastWinningBet;
+		ethData.lastPayoutTime = json.lastPayoutTime;
+	} catch (err) {
+		if (err) {
+			const logTime = moment().tz("Europe/Belgrade").format();
+			console.log(logTime + ': ' + err);
+			console.log('------------------------');
+		}
 	}
 });
 
@@ -76,6 +88,7 @@ createNewAddress = () => {
 			if (availableAddresses < 50 && !creatingAddress) {
 				creatingAddress = true;
 				console.log('Not enough addresses in the pool, creating new address.');
+				console.log('------------------------');
 				const pass = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
 				web3.eth.personal.newAccount(pass).then(address => {
 					const newAddress = address;
@@ -85,18 +98,44 @@ createNewAddress = () => {
 								if (unlocked) {
 									web3.eth.sendTransaction({ from: coinbaseAddress, to: newAddress, value: web3.utils.toWei("5", "ether") }).then(receipt => {
 										console.log('Created new address, gas spent: ' + parseInt(receipt.gasUsed));
+										console.log('------------------------');
 										contractInstance.methods.createNewAddress(newAddress, pass).send({ from: coinbaseAddress, gas: 200000 }).then(receipt => {
 											creatingAddress = false;
 											console.log('New address is now available, gas spent: ' + parseInt(receipt.gasUsed));
 											console.log('Number of available addresses: ' + availableAddresses);
+											console.log('------------------------');
+										}).catch(err => {
+											const logTime = moment().tz("Europe/Belgrade").format();
+											console.log(logTime + ': ' + err);
+											console.log('------------------------');
 										});
+									}).catch(err => {
+										const logTime = moment().tz("Europe/Belgrade").format();
+										console.log(logTime + ': ' + err);
+										console.log('------------------------');
 									});
 								}
+							}).catch(err => {
+								const logTime = moment().tz("Europe/Belgrade").format();
+								console.log(logTime + ': ' + err);
+								console.log('------------------------');
 							});
 						}
+					}).catch(err => {
+						const logTime = moment().tz("Europe/Belgrade").format();
+						console.log(logTime + ': ' + err);
+						console.log('------------------------');
 					});
+				}).catch(err => {
+					const logTime = moment().tz("Europe/Belgrade").format();
+					console.log(logTime + ': ' + err);
+					console.log('------------------------');
 				});
 			}
+		}).catch(err => {
+			const logTime = moment().tz("Europe/Belgrade").format();
+			console.log(logTime + ': ' + err);
+			console.log('------------------------');
 		});
 	}
 }
@@ -121,7 +160,6 @@ getEthPrice = () => {
 					!betPriceSet) {
 					ethData.betEthPrice = ethData.currentEthPrice;
 					ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
-					ethData.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
 					betPriceSet = true;
 					const logTime = moment().tz("Europe/Belgrade").format();
 					console.log(logTime);
@@ -133,18 +171,24 @@ getEthPrice = () => {
 				// save eth price and time data
 				const json = JSON.stringify(ethData);
 				fs.writeFile("ethData.json", json, function (err) {
-					const logTime = moment().tz("Europe/Belgrade").format();
-					// console.log(logTime + ': Data saved.');
+					if (err) {
+						const logTime = moment().tz("Europe/Belgrade").format();
+						console.log(logTime + ': ' + err);
+						console.log('------------------------');
+					}
 				});
 				// save eth price history
 				fs.readFile('ethHistory.json', function (err, data) {
 					let json = JSON.parse(data);
 					json.splice(0, json.length - 150);
 					json.push(json_ethHistory);
-					const new_json = JSON.stringify(json);
-					fs.writeFile("ethHistory.json", new_json, function (err) {
-						const logTime = moment().tz("Europe/Belgrade").format();
-						// console.log(logTime + ': ETH history data saved.');
+					json = JSON.stringify(json);
+					fs.writeFile("ethHistory.json", json, function (err) {
+						if (err) {
+							const logTime = moment().tz("Europe/Belgrade").format();
+							console.log(logTime + ': ' + err);
+							console.log('------------------------');
+						}
 					});
 				});
 			}
@@ -157,29 +201,43 @@ getEthPrice = () => {
  */
 distributeRewards = () => {
 	if (coinbaseAddress != '') {
-		lastPayoutTime = currentTime.hour + ':' + currentTime.minute;
-		let winningBet;
 		if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) == 0) {
-			winningBet = 0;
+			ethData.lastWinningBet = 0;
 		} else if (((ethData.currentEthPrice / ethData.betEthPrice - 1) * 100) < 0) {
-			winningBet = 1;
+			ethData.lastWinningBet = 1;
 		} else {
-			winningBet = 2;
+			ethData.lastWinningBet = 2;
 		}
+		const json = JSON.stringify(ethData);
+		fs.writeFile("ethData.json", json, function (err) {
+			if (err) {
+				const logTime = moment().tz("Europe/Belgrade").format();
+				console.log(logTime + ': ' + err);
+				console.log('------------------------');
+			}
+		});
 		const logTime = moment().tz("Europe/Belgrade").format();
 		console.log(logTime);
-		console.log('Winning bet: ' + winningBet);
+		console.log('Winning bet: ' + ethData.lastWinningBet);
 		console.log('------------------------');
 		web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
 			if (unlocked) {
-				contractInstance.methods.payWinnigBets(winningBet).send({ from: coinbaseAddress, gas: 5000000 }).then(receipt => {
+				contractInstance.methods.payWinnigBets(ethData.lastWinningBet).send({ from: coinbaseAddress, gas: 5000000 }).then(receipt => {
 					betPriceSet = false;
 					const logTime = moment().tz("Europe/Belgrade").format();
 					console.log(logTime);
 					console.log('Rewards distributed, gas spent: ' + parseInt(receipt.gasUsed));
 					console.log('------------------------');
+				}).catch(err => {
+					const logTime = moment().tz("Europe/Belgrade").format();
+					console.log(logTime + ': ' + err);
+					console.log('------------------------');
 				});
 			}
+		}).catch(err => {
+			const logTime = moment().tz("Europe/Belgrade").format();
+			console.log(logTime + ': ' + err);
+			console.log('------------------------');
 		});
 	}
 }
@@ -198,19 +256,13 @@ updateTime = () => {
 	currentTime.second = time.get('second');
 
 	// set node service update time
-	fs.readFile('ethData.json', function (err, data) {
-		try {
-			JSON.parse(data);
-			var json = JSON.parse(data);
-			ethData.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
-			json.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
-			const updatedJson = JSON.stringify(json);
-			fs.writeFile("ethData.json", updatedJson, function (err) {
-				const logTime = moment().tz("Europe/Belgrade").format();
-				// console.log(logTime + ': Data saved.');
-			});
-		} catch (e) {
-			console.log('ethData not valid: ' + e);
+	serviceTime.updateTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
+	let json = JSON.stringify(serviceTime);
+	fs.writeFile("serviceTime.json", json, function (err) {
+		if (err) {
+			const logTime = moment().tz("Europe/Belgrade").format();
+			console.log(logTime + ': ' + err);
+			console.log('------------------------');
 		}
 	});
 
@@ -229,7 +281,8 @@ updateTime = () => {
 		currentTime.minute == 30 ||
 		currentTime.minute == 40 ||
 		currentTime.minute == 50) &&
-		lastPayoutTime != currentTime.hour + ':' + currentTime.minute) {
+		ethData.lastPayoutTime != currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute) {
+		ethData.lastPayoutTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute;
 		distributeRewards();
 	}
 }
