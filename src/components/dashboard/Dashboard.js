@@ -43,8 +43,7 @@ class Dashboard extends Component {
             possibleDownWinning : 0,
             upCoeficient : 0,
             downCoeficient : 0,
-            realBetAmount : 0,
-            resultStatusMsg: false
+            realBetAmount : 0
         }
     
     //get possible winning
@@ -125,18 +124,14 @@ class Dashboard extends Component {
                 currentTimeMinute === 10 ||
                 currentTimeMinute === 20 ||
                 currentTimeMinute === 30 ||
-                currentTimeMinute === 40 ||
+                currentTimeMinute === 41 ||
                 currentTimeMinute === 50) &&
                 currentTimeSecond > 5) {
-                    if (!sessionStorage.getItem('resultStatusMsg')) {
-                        this.checkResults();
-                    }
-            } else {
-                // this.setState({
-                //     resultStatusMsg: false
-                // });
-                sessionStorage.setItem('resultStatusMsg', false);
-            }
+                if (sessionStorage.getItem('resultStatusMsg') === 'false') {
+                    this.checkResults();
+                }
+            } else
+                sessionStorage.setItem('resultStatusMsg', 'false');
         }, 1000);
     }
 
@@ -169,8 +164,8 @@ class Dashboard extends Component {
         // }
         // get last round winning type
         axios.get('/update_service/ethData.json').then(response => {
-            if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date(response.data.roundTime))) < 60000 && this.state.resultStatusMsg === false) {
-                sessionStorage.setItem('resultStatusMsg', true);
+            if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date(response.data.roundTime))) < 60000 && sessionStorage.getItem('resultStatusMsg') === 'false') {
+                sessionStorage.setItem('resultStatusMsg', 'true');
                 let betWon;
                 if (response.data.lastWinningBet === 1)
                     betWon = 'Down';
