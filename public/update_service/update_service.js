@@ -285,9 +285,8 @@ updateTime = () => {
 		ethData.lastPayoutTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute;
 		// check if there are bets and distribute rewards
 		contractInstance.methods.hasPlayers().call({ from: coinbaseAddress }).then(receipt => {
-			if (receipt) {
+			if (receipt)
 				distributeRewards();
-			}
 		});
 	}
 

@@ -79,9 +79,8 @@ class Dashboard extends Component {
                 currentTimeMinute === 30 ||
                 currentTimeMinute === 40 ||
                 currentTimeMinute === 50) {
-                    if (!this.state.resultStatusMsg) {
+                    if (!this.state.resultStatusMsg)
                         this.checkResults();
-                    }
             } else {
                 this.setState({
                     resultStatusMsg: false
@@ -89,6 +88,10 @@ class Dashboard extends Component {
             }
         }, 1000);
     }
+
+    componentWillUnmount = () => {
+        clearTimeout(this.betResultTimer);
+    };
     
     changeBtnStateTrue = () =>{
         this.setState({
