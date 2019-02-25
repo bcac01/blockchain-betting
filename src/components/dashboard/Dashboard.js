@@ -44,7 +44,9 @@ class Dashboard extends Component {
             upCoeficient : 0,
             downCoeficient : 0,
             realBetAmount : 0,
-            resultStatusMsg: false
+            showRoundResult: false,
+            roundResult: '',
+            checkedForResult: false
         }
     
     //get possible winning
@@ -131,22 +133,19 @@ class Dashboard extends Component {
     componentDidMount = () => {
         this.betResultTimer = setInterval(() => {
             const currentTimeMinute = moment(new Date()).get('minute');
-            const currentTimeSecond = moment(new Date()).get('second');
-            if ((currentTimeMinute === 0 ||
+            if (currentTimeMinute === 0 ||
                 currentTimeMinute === 10 ||
                 currentTimeMinute === 20 ||
                 currentTimeMinute === 30 ||
                 currentTimeMinute === 40 ||
-                currentTimeMinute === 50) &&
-                currentTimeSecond > 5) {
-                    if (!sessionStorage.getItem('resultStatusMsg')) {
-                        this.checkResults();
-                    }
+                currentTimeMinute === 50) {
+                if (!this.state.checkedForResult) {
+                    this.checkResults();
+                }
             } else {
-                // this.setState({
-                //     resultStatusMsg: false
-                // });
-                sessionStorage.setItem('resultStatusMsg', false);
+                this.setState({
+                    checkedForResult: false
+                })
             }
         }, 1000);
     }
@@ -179,9 +178,13 @@ class Dashboard extends Component {
             
         // }
         // get last round winning type
+        console.log('check for round result');
+        
         axios.get('/update_service/ethData.json').then(response => {
-            if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date(response.data.roundTime))) < 60000 && this.state.resultStatusMsg === false) {
-                sessionStorage.setItem('resultStatusMsg', true);
+            if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date())) < 60000) {
+                this.setState({
+                    checkedForResult: true
+                })
                 let betWon;
                 if (response.data.lastWinningBet === 1)
                     betWon = 'Down';
@@ -189,9 +192,18 @@ class Dashboard extends Component {
                     betWon = 'Tie'
                 else
                     betWon = 'Up';
-                alert('Round has finished, the winning bet was: ' + betWon);
+                this.setState({
+                    roundResult: betWon,
+                    showRoundResult: true
+                })
             }
         });
+    }
+
+    hideRoundResultMsg = () => {
+        this.setState({ 
+            showRoundResult: false
+        })
     }
 
     handleBet = (e) => {
@@ -300,6 +312,16 @@ class Dashboard extends Component {
         return (
             <div className="dashboard-wrapper">
             <div className="row">
+                {
+                    this.state.showRoundResult ?
+                        <div className="col">
+                            <div className="alert alert-info alert-dismissible">
+                                <a href="#0" className="close" data-dismiss="alert" aria-label="close" onClick={this.hideRoundResultMsg}>&times;</a>
+                                Round has finished, the winning bet was: {this.state.roundResult}
+                            </div>
+                        </div>
+                    : null
+                }
                 {
                 this.state.betAccepted ?
                     <div className="col">
