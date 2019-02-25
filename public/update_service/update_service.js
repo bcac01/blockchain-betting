@@ -220,20 +220,30 @@ distributeRewards = () => {
 		console.log(logTime);
 		console.log('Winning bet: ' + ethData.lastWinningBet);
 		console.log('------------------------');
-		web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
-			if (unlocked) {
-				contractInstance.methods.payWinnigBets(ethData.lastWinningBet).send({ from: coinbaseAddress, gas: 5000000 }).then(receipt => {
-					betPriceSet = false;
-					const logTime = moment().tz("Europe/Belgrade").format();
-					console.log(logTime);
-					console.log('Rewards distributed, gas spent: ' + parseInt(receipt.gasUsed));
-					console.log('------------------------');
+		// check if there are bets and distribute rewards
+		contractInstance.methods.hasPlayers().call({ from: coinbaseAddress }).then(receipt => {
+			if (receipt) {
+				web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 120).then(unlocked => {
+					if (unlocked) {
+						contractInstance.methods.payWinnigBets(ethData.lastWinningBet).send({ from: coinbaseAddress, gas: 5000000 }).then(receipt => {
+							betPriceSet = false;
+							const logTime = moment().tz("Europe/Belgrade").format();
+							console.log(logTime);
+							console.log('Rewards distributed, gas spent: ' + parseInt(receipt.gasUsed));
+							console.log('------------------------');
+						}).catch(err => {
+							const logTime = moment().tz("Europe/Belgrade").format();
+							console.log(logTime + ': ' + err);
+							console.log('------------------------');
+						});
+					}
 				}).catch(err => {
 					const logTime = moment().tz("Europe/Belgrade").format();
 					console.log(logTime + ': ' + err);
 					console.log('------------------------');
 				});
-			}
+			} else
+				betPriceSet = false;
 		}).catch(err => {
 			const logTime = moment().tz("Europe/Belgrade").format();
 			console.log(logTime + ': ' + err);
@@ -283,11 +293,7 @@ updateTime = () => {
 		currentTime.minute == 50) &&
 		ethData.lastPayoutTime != currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute) {
 		ethData.lastPayoutTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute;
-		// check if there are bets and distribute rewards
-		contractInstance.methods.hasPlayers().call({ from: coinbaseAddress }).then(receipt => {
-			if (receipt)
-				distributeRewards();
-		});
+		distributeRewards();
 	}
 
 	

@@ -80,7 +80,7 @@ class Dashboard extends Component {
                 currentTimeMinute === 40 ||
                 currentTimeMinute === 50) &&
                 currentTimeSecond > 5) {
-                    if (!sessionStorage.setItem('resultStatusMsg')) {
+                    if (!sessionStorage.getItem('resultStatusMsg')) {
                         this.checkResults();
                     }
             } else {
@@ -119,6 +119,7 @@ class Dashboard extends Component {
         //     console.log('no bets');
             
         // }
+        // get last round winning type
         axios.get('/update_service/ethData.json').then(response => {
             if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date(response.data.roundTime))) < 60000 && this.state.resultStatusMsg === false) {
                 sessionStorage.setItem('resultStatusMsg', true);
