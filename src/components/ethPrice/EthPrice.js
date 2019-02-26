@@ -9,6 +9,7 @@ var QRCode = require('qrcode.react');
 global.totalBetAmount= 0;
 global.totalBetUpAmount= 0;
 global.totalBetDownAmount = 0;
+global.currentBalance= '';
 
 const web3 = new Web3(nodeUrl.url);
 
@@ -30,7 +31,6 @@ class EthPrice extends Component {
             price: 0,
             betPrice: 0,
             priceDifference: 0,
-            currentBalance: '',
             walletAddress: '',
             //totalBetAmount: 0,
             //totalBetUpAmount: 0,
@@ -44,9 +44,7 @@ class EthPrice extends Component {
      */
     getUserBalance = () => {
         web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=> {
-            this.setState({
-                currentBalance: web3.utils.fromWei(balance,'ether')
-            });
+                global.currentBalance= web3.utils.fromWei(balance,'ether')
         })
     }
     
@@ -78,7 +76,7 @@ class EthPrice extends Component {
                 price: response.data.currentEthPrice,
                 betPrice: response.data.betEthPrice,
                 priceDifference: ((response.data.currentEthPrice /
-                    response.data.betEthPrice - 1) * 100).toFixed(2)
+                response.data.betEthPrice - 1) * 100).toFixed(2)
             });
             // set round time globaly
             global.roundTime = response.data.roundTime;
@@ -90,10 +88,6 @@ class EthPrice extends Component {
             this.getEthData();
         }, 1000);
         this.getEthData();
-        this.getBalanceTimer = setInterval(() => {
-            this.getUserBalance();
-            this.getTotalBetAmount();
-        }, 5000);
         this.getUserBalance();
         this.getTotalBetAmount();
         this.setState({
@@ -171,7 +165,7 @@ class EthPrice extends Component {
                 :null
                 }
                 <div className="col float-center myWallet">
-                    <h2 className="float-center">Current balance : {this.state.currentBalance} - ETH</h2>
+                    <h2 className="float-center">Current balance : {global.currentBalance} - ETH</h2>
                 </div>
             </div>
             <div className="row">
