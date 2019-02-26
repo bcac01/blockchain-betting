@@ -9,6 +9,7 @@ var QRCode = require('qrcode.react');
 global.totalBetAmount= 0;
 global.totalBetUpAmount= 0;
 global.totalBetDownAmount = 0;
+global.currentBalance= '';
 
 const web3 = new Web3(nodeUrl.url);
 
@@ -30,7 +31,6 @@ class EthPrice extends Component {
             price: 0,
             betPrice: 0,
             priceDifference: 0,
-            currentBalance: '',
             walletAddress: '',
             //totalBetAmount: 0,
             //totalBetUpAmount: 0,
@@ -44,9 +44,7 @@ class EthPrice extends Component {
      */
     getUserBalance = () => {
         web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=> {
-            this.setState({
-                currentBalance: web3.utils.fromWei(balance,'ether')
-            });
+                global.currentBalance= web3.utils.fromWei(balance,'ether')
         })
     }
     

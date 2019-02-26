@@ -49,6 +49,27 @@ class Dashboard extends Component {
             checkedForResult: false
         }
     
+    /**
+     * Get user balance
+     */
+    getUserBalance = () => {
+        web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=> {
+            global.currentBalance= web3.utils.fromWei(balance,'ether')
+        })
+    }
+    
+    /**
+     * Get total/up/down bet amount
+     */
+    getTotalBetAmount = () => {
+        contractInstance.methods.BetStatistics().call()
+        .then((response) => {
+                 global.totalBetAmount= web3.utils.fromWei(response[0],'ether');
+                 global.totalBetDownAmount= web3.utils.fromWei(response[1],'ether');
+                 global.totalBetUpAmount= web3.utils.fromWei(response[2],'ether');
+        });
+    }
+
     //get possible winning
     getPossibleWinning = () => { 
         if (parseFloat(this.state.inputValue.replace(",", ".")) !== 0)
