@@ -8,6 +8,8 @@ const nodeUrl = require('../../src/eth-node-config'),
 	contractAddress = compiledContract.networks['300'].address,
 	contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
 
+moment.tz.setDefault("Europe/Belgrade");
+
 let coinbaseAddress = '',
 	availableAddresses = 0,
 	creatingAddress = false,
