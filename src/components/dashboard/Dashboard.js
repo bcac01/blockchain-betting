@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import nodeUrl from '../../eth-node-config.json';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
+
+moment.tz.setDefault("Europe/Belgrade");
 
 /**
  * Create web3 instance
@@ -157,12 +159,6 @@ class Dashboard extends Component {
                     showRoundResult: false
                 })
             }
-            // show bet controls if roundTime is up to date (update service is running)
-            // if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 10) {
-            //     this.setState({
-            //         showBetControls: true
-            //     })
-            // }
         }, 1000);
 
     }
@@ -296,7 +292,7 @@ class Dashboard extends Component {
                                                     myBets.push({
                                                         'betAmount': this.state.inputValue,
                                                         'betType': placedBetName,
-                                                        'betTime': new Date()
+                                                        'betTime': moment(new Date()).format('DD-MMM-YYYY HH:mm')
                                                     });
                                                     this.getTotalBetAmount();
                                                     this.getUserBalance();

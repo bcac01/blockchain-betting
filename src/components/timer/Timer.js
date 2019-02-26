@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import nodeUrl from '../../eth-node-config.json';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
+
+moment.tz.setDefault("Europe/Belgrade");
 
 /**
  * Create web3 instance

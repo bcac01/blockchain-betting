@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import nodeUrl from './eth-node-config.json';
 import './App.css';
 import Web3 from 'web3';
@@ -13,6 +13,8 @@ import EthPrice from './components/ethPrice/EthPrice';
 import Graph from './components/graph/Graph';
 import Timer from './components/timer/Timer';
 import Withdraw from './components/withdraw/Withdraw';
+
+moment.tz.setDefault("Europe/Belgrade");
 
 global.disablebutton = false;
 global.roundTime = '';
