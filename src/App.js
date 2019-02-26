@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import nodeUrl from './eth-node-config.json';
 import './App.css';
 import Web3 from 'web3';
@@ -14,7 +14,10 @@ import Graph from './components/graph/Graph';
 import Timer from './components/timer/Timer';
 import Withdraw from './components/withdraw/Withdraw';
 
+moment.tz.setDefault("Europe/Belgrade");
+
 global.disablebutton = false;
+global.roundTime = '';
 /**
  * Create web3 instance
  */
@@ -72,7 +75,7 @@ class App extends Component {
       this.hideSignin();
     }
 
-    // disable app if node service is down for more than 5 seconds
+    // disable app if node service is down for more than 3 seconds
     this.serviceTimer = setInterval(() => {
       this.checkService();
       if (this.state.showServiceMsg === true)
@@ -95,7 +98,7 @@ class App extends Component {
 
   checkService = () => {
     axios.get('/update_service/serviceTime.json').then(response => {
-      if (moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') > 5) {
+      if (moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') >= 5) {
         this.setState({
           showSignin: false,
           showSignout: false,
@@ -109,6 +112,19 @@ class App extends Component {
         });
         sessionStorage.clear();
         console.log('time not ok');
+      }
+      // disable bet controls if round time is invalid
+      if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 11 &&
+        moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') < 5) {
+        this.setState({
+          showDashboard: true,
+          showTimer: true
+        })
+      } else {
+        this.setState({
+          showDashboard: false,
+          showTimer: false
+        })
       }
     });
   }
@@ -145,7 +161,7 @@ class App extends Component {
     }
 
     let timer = null;
-    if(this.state.showTimer) {
+    if (this.state.showTimer) {
       timer = (<Timer />);
     }
 

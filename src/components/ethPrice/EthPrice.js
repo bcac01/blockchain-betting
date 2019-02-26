@@ -78,6 +78,8 @@ class EthPrice extends Component {
                 priceDifference: ((response.data.currentEthPrice /
                 response.data.betEthPrice - 1) * 100).toFixed(2)
             });
+            // set round time globaly
+            global.roundTime = response.data.roundTime;
         });
     }
 

@@ -1,7 +1,9 @@
 import React from "react";
 import axios from 'axios';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Chart from 'chart.js';
+
+moment.tz.setDefault("Europe/Belgrade");
 
 class Graph extends React.Component {
 

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import nodeUrl from '../../eth-node-config.json';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
+
+moment.tz.setDefault("Europe/Belgrade");
 
 /**
  * Create web3 instance
@@ -158,6 +160,7 @@ class Dashboard extends Component {
                 })
             }
         }, 1000);
+
     }
 
     componentWillUnmount = () => {
@@ -289,7 +292,7 @@ class Dashboard extends Component {
                                                     myBets.push({
                                                         'betAmount': this.state.inputValue,
                                                         'betType': placedBetName,
-                                                        'betTime': new Date()
+                                                        'betTime': moment(new Date()).format('DD-MMM-YYYY HH:mm')
                                                     });
                                                     this.getTotalBetAmount();
                                                     this.getUserBalance();
@@ -364,34 +367,34 @@ class Dashboard extends Component {
                 <div className="row">
                     <div className="col-sm-3">
                         {
-                            parseFloat(this.state.inputValue.replace(",",".")) > 0 
-                            && this.state.inputValue !== ''?
+                            parseFloat(this.state.inputValue.replace(",", ".")) > 0
+                                && this.state.inputValue !== '' ?
                                 <p className="possibleWin">{this.state.possibleUpWinning.toFixed(10)}</p>
-                            :null
+                                : null
                         }
-                        <button disabled={this.state.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
+                        <button disabled={this.state.disablebutton} className="betup" name="bet up" onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-6">
-                    {
-                        parseFloat(this.state.inputValue.replace(",",".")) > 0 
-                        && this.state.inputValue !== ''?
-                            <p className="possibleWin">&#8592;  possible win  &#8594;</p>
-                        :null
-                    }
-                        <input disabled={this.state.disablebutton} id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
+                        {
+                            parseFloat(this.state.inputValue.replace(",", ".")) > 0
+                                && this.state.inputValue !== '' ?
+                                <p className="possibleWin">&#8592;  possible win  &#8594;</p>
+                                : null
+                        }
+                        <input disabled={this.state.disablebutton} id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue} />
                         <p><sup>* transaction fee is 0.00195 eth</sup></p>
-                    {
-                        formErrors.inputValueE.length > 0 && (
-                            <p className="errorMessage">{formErrors.inputValueE}</p>
-                        )
-                    }
+                        {
+                            formErrors.inputValueE.length > 0 && (
+                                <p className="errorMessage">{formErrors.inputValueE}</p>
+                            )
+                        }
                     </div>
                     <div className="col-sm-3">
-                    {
-                        parseFloat(this.state.inputValue.replace(",",".")) > 0 && this.state.inputValue !== ''?
-                            <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
-                        :null
-                    }
+                        {
+                            parseFloat(this.state.inputValue.replace(",", ".")) > 0 && this.state.inputValue !== '' ?
+                                <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
+                                : null
+                        }
                         <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
                     </div>
                 </div>
@@ -412,7 +415,7 @@ class Dashboard extends Component {
                     :null
                 }
                 {
-                    JSON.parse(localStorage.getItem('bets')).length > 0 ?
+                    (localStorage.getItem('bets') && JSON.parse(localStorage.getItem('bets')).length > 0) ?
                         <div className="row">
                                 <div className="col-12 bets-list">
                                     <p>Your bets:</p>

@@ -1,9 +1,11 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import moment from 'moment';
+import moment from 'moment-timezone';
 import nodeUrl from '../../eth-node-config.json';
 import Web3 from 'web3';
 import compiledContract from '../../truffle/build/contracts/BettingApp.json';
+
+moment.tz.setDefault("Europe/Belgrade");
 
 /**
  * Create web3 instance
@@ -105,13 +107,11 @@ class Timer extends Component {
             this.setState({
                 timeRemaining: moment(new Date(this.state.roundTime)).add(8, 'minutes').diff(moment(new Date())),
                 timeReal: moment(new Date(this.state.roundTime)).add(9, 'minutes').diff(moment(new Date())),
-                timeToNextRound: moment(new Date(this.state.roundTime)).add(10, 'minutes').diff(moment(new Date()))
+                timeToNextRound: moment(new Date(this.state.roundTime)).add(10, 'minutes').diff(moment(new Date())),
+                timeStart: moment(new Date(this.state.roundTime)).format('DD/MMM/YYYY HH:mm'),
+                timeEnd: moment(new Date(this.state.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm')
             });
         }
-        this.setState({
-            timeStart: moment(new Date(this.state.roundTime)).format('DD/MMM/YYYY HH:mm'),
-            timeEnd: moment(new Date(this.state.roundTime)).add(9, 'minutes').format('DD/MMM/YYYY HH:mm')
-        });
     }
 
     componentWillUnmount = () => {
@@ -123,32 +123,32 @@ class Timer extends Component {
             <div className="timer-wrapper col">
             {
                 (this.state.timeReal > 61000)?
-                <div className="row">
-                    <div className="col-sm-6 column-in-center">
-                        <h2>Time remaining for bets:</h2>
-                        <h2>{moment(this.state.timeRemaining).format('mm:ss')}</h2>
+                    <div className="row">
+                        <div className="col-sm-6 column-in-center">
+                            <h2>Time remaining for bets:</h2>
+                            <h2>{moment(this.state.timeRemaining).format('mm:ss')}</h2>
+                        </div>
                     </div>
-                </div>
-                :null
+                : null
             }
             {
                 (this.state.timeReal <= 61000 && this.state.timeReal >= 1000)?
-                <div className="row">
-                    <div className="col-sm-6 column-in-center">
-                        <h2 className="h2Red">Wait until round is finished</h2>
-                        <h2 className="h2Red">{moment(this.state.timeReal).format('mm:ss')}</h2>
+                    <div className="row">
+                        <div className="col-sm-6 column-in-center">
+                            <h2 className="h2Red">Wait until round is finished</h2>
+                            <h2 className="h2Red">{moment(this.state.timeReal).format('mm:ss')}</h2>
+                        </div>
                     </div>
-                </div>
                 :null
             }
             {
                 (this.state.timeReal < 1000)?
-                <div className="row">
-                    <div className="col-sm-6 column-in-center">
-                        <h2 className="h2Yellow">New round starts in</h2>
-                        <h2 className="h2Yellow">{moment(this.state.timeToNextRound).format('mm:ss')}</h2>
+                    <div className="row">
+                        <div className="col-sm-6 column-in-center">
+                            <h2 className="h2Yellow">New round starts in</h2>
+                            <h2 className="h2Yellow">{moment(this.state.timeToNextRound).format('mm:ss')}</h2>
+                        </div>
                     </div>
-                </div>
                 :null
             }
                 <div className="row">

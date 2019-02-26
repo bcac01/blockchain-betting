@@ -159,7 +159,7 @@ getEthPrice = () => {
 					currentTime.minute == 51) &&
 					!betPriceSet) {
 					ethData.betEthPrice = ethData.currentEthPrice;
-					ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':' + currentTime.second;
+					ethData.roundTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute + ':0';
 					betPriceSet = true;
 					const logTime = moment().tz("Europe/Belgrade").format();
 					console.log(logTime);
