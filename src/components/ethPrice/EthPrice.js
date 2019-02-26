@@ -76,7 +76,7 @@ class EthPrice extends Component {
                 price: response.data.currentEthPrice,
                 betPrice: response.data.betEthPrice,
                 priceDifference: ((response.data.currentEthPrice /
-                    response.data.betEthPrice - 1) * 100).toFixed(2)
+                response.data.betEthPrice - 1) * 100).toFixed(2)
             });
         });
     }
@@ -86,10 +86,6 @@ class EthPrice extends Component {
             this.getEthData();
         }, 1000);
         this.getEthData();
-        this.getBalanceTimer = setInterval(() => {
-            this.getUserBalance();
-            this.getTotalBetAmount();
-        }, 5000);
         this.getUserBalance();
         this.getTotalBetAmount();
         this.setState({
@@ -167,7 +163,7 @@ class EthPrice extends Component {
                 :null
                 }
                 <div className="col float-center myWallet">
-                    <h2 className="float-center">Current balance : {this.state.currentBalance} - ETH</h2>
+                    <h2 className="float-center">Current balance : {global.currentBalance} - ETH</h2>
                 </div>
             </div>
             <div className="row">

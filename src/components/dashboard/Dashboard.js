@@ -75,32 +75,21 @@ class Dashboard extends Component {
         if (parseFloat(this.state.inputValue.replace(",", ".")) !== 0)
         {
             //possible down bet
-            if (parseFloat(global.totalBetUpAmount.replace(",",".")) === 0)
+            if (parseFloat(global.totalBetUpAmount) === 0)
             {
                 this.state.possibleDownWinning = 0;
             }
             else
             {
-                this.setState({
-                realBetAmount : parseFloat(global.totalBetAmount) 
+                this.state.realBetAmount= parseFloat(global.totalBetAmount) 
                 + parseFloat(this.state.inputValue.replace(",", "."))
-                - (parseFloat(global.totalBetUpAmount) * 10 / 100),
-                downCoeficient : parseFloat(this.state.realBetAmount) 
+                - (parseFloat(global.totalBetUpAmount) * 10 / 100);
+                this.state.downCoeficient = parseFloat(this.state.realBetAmount) 
                 / (parseFloat(global.totalBetDownAmount)
-                + parseFloat(this.state.inputValue.replace(",", "."))),
-                 possibleDownWinning : 
+                + parseFloat(this.state.inputValue.replace(",", ".")));
+                 this.state.possibleDownWinning = 
                  parseFloat(this.state.inputValue.replace(",", "."))
-                 * parseFloat(this.state.downCoeficient),
-                });
-                // this.state.realBetAmount= parseFloat(global.totalBetAmount) 
-                // + parseFloat(this.state.inputValue.replace(",", "."))
-                // - (parseFloat(global.totalBetUpAmount) * 10 / 100);
-                // this.state.downCoeficient = parseFloat(this.state.realBetAmount) 
-                // / (parseFloat(global.totalBetDownAmount)
-                // + parseFloat(this.state.inputValue.replace(",", ".")));
-                //  this.state.possibleDownWinning = 
-                //  parseFloat(this.state.inputValue.replace(",", "."))
-                //  * parseFloat(this.state.downCoeficient);
+                 * parseFloat(this.state.downCoeficient);
             }
 
             //possible up bet
@@ -205,7 +194,8 @@ class Dashboard extends Component {
                     betWon = 'Up';
                 this.setState({
                     roundResult: betWon,
-                    showRoundResult: true
+                    showRoundResult: true,
+                    betAccepted: null,
                 })
             }
         });
@@ -301,8 +291,13 @@ class Dashboard extends Component {
                                                         'betType': placedBetName,
                                                         'betTime': new Date()
                                                     });
+                                                    this.getTotalBetAmount();
+                                                    this.getUserBalance();
                                                     localStorage.setItem('bets', JSON.stringify(myBets));
                                                     this.changeBtnStateFalse();
+                                                    this.setState({
+                                                        inputValue: '',
+                                                    })
                                                     console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                                 } else {
                                                     this.resetBet();

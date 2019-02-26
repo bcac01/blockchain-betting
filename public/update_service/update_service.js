@@ -232,6 +232,7 @@ distributeRewards = () => {
 							console.log(logTime);
 							console.log('Rewards distributed, gas spent: ' + parseInt(receipt.gasUsed));
 							console.log('------------------------');
+							console.log(global.currentBalance);
 						}).catch(err => {
 							const logTime = moment().tz("Europe/Belgrade").format();
 							console.log(logTime + ': ' + err);

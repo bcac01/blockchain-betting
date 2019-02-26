@@ -1,6 +1,24 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import moment from 'moment';
+import nodeUrl from '../../eth-node-config.json';
+import Web3 from 'web3';
+import compiledContract from '../../truffle/build/contracts/BettingApp.json';
+
+/**
+ * Create web3 instance
+ */
+const web3 = new Web3(nodeUrl.url);
+
+/**
+ * Get address from compiled contract
+ */
+const contractAddress = compiledContract.networks['300'].address;
+
+/**
+ * Create contract instance
+ */
+const contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
 
 class Timer extends Component {
 
@@ -13,6 +31,27 @@ class Timer extends Component {
             roundTime: '',
             roundTimeUpdated: false
         }
+    }
+
+    /**
+     * Get user balance
+     */
+    getUserBalance = () => {
+        web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=> {
+            global.currentBalance= web3.utils.fromWei(balance,'ether')
+        })
+    }
+    
+    /**
+     * Get total/up/down bet amount
+     */
+    getTotalBetAmount = () => {
+        contractInstance.methods.BetStatistics().call()
+        .then((response) => {
+                 global.totalBetAmount= web3.utils.fromWei(response[0],'ether');
+                 global.totalBetDownAmount= web3.utils.fromWei(response[1],'ether');
+                 global.totalBetUpAmount= web3.utils.fromWei(response[2],'ether');
+        });
     }
 
     componentDidMount() {
@@ -28,6 +67,8 @@ class Timer extends Component {
                 currentTimeMinute === 41 ||
                 currentTimeMinute === 51) &&
                 !this.state.roundTimeUpdated) {
+                    this.getUserBalance();
+                    this.getTotalBetAmount();
                     this.updateRoundTime();
             } else {
                 this.setState({
