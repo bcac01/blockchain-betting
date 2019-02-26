@@ -18,6 +18,12 @@ class Graph extends React.Component {
             });
             let minPrice = 10000;
             let maxPrice = 0;
+            var ctx = document.getElementById('myChart').getContext("2d")
+            var gradientStroke = ctx.createLinearGradient(10, 400, 10, 100);
+            gradientStroke.addColorStop(0, "#242424");
+            gradientStroke.addColorStop(0.2, "#353535");
+            gradientStroke.addColorStop(0.5, "#555555");
+            gradientStroke.addColorStop(1, "#FFFFFF");
             for (let i = 0; i < response.data.length; i++) {
                 let dataRow = response.data[i];
                 let chartData = {};
@@ -34,13 +40,14 @@ class Graph extends React.Component {
                 data: {
                     datasets: [{
                         label: "ETH Price",
-                        backgroundColor: 'rgba(50,255,50,0.1)',
+                        //backgroundColor: 'rgba(65,105,225,0.5)',
+                        backgroundColor: gradientStroke,
                         borderColor: 'rgba(65,105,225,0.5)',
                         pointBackgroundColor: 'rgba(65,105,225,0.5)',
                         pointBorderColor: 'rgba(65,105,225,0)',
                         pointBorderWidth: 1,
                         data: this.state.tempData,
-                        fill: false
+                        fill: true
                     }]
                 },
                 options: {
@@ -116,7 +123,7 @@ class Graph extends React.Component {
     render() {
         return (
             <div className="col-sm-12">
-                <canvas
+                <canvas id="myChart"
                     style={{ width: 800, height: 520 }}
                     ref={node => (this.node = node)}
                 />
