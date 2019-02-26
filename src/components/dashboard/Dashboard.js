@@ -147,7 +147,14 @@ class Dashboard extends Component {
                     showRoundResult: false
                 })
             }
+            // show bet controls if roundTime is up to date (update service is running)
+            // if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 10) {
+            //     this.setState({
+            //         showBetControls: true
+            //     })
+            // }
         }, 1000);
+
     }
 
     componentWillUnmount = () => {
@@ -348,34 +355,34 @@ class Dashboard extends Component {
                 <div className="row">
                     <div className="col-sm-3">
                         {
-                            parseFloat(this.state.inputValue.replace(",",".")) > 0 
-                            && this.state.inputValue !== ''?
+                            parseFloat(this.state.inputValue.replace(",", ".")) > 0
+                                && this.state.inputValue !== '' ?
                                 <p className="possibleWin">{this.state.possibleUpWinning.toFixed(10)}</p>
-                            :null
+                                : null
                         }
-                        <button disabled={this.state.disablebutton} className="betup" name="bet up"  onClick={this.handleBet}>Bet up</button>
+                        <button disabled={this.state.disablebutton} className="betup" name="bet up" onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-6">
-                    {
-                        parseFloat(this.state.inputValue.replace(",",".")) > 0 
-                        && this.state.inputValue !== ''?
-                            <p className="possibleWin">&#8592;  possible win  &#8594;</p>
-                        :null
-                    }
-                        <input disabled={this.state.disablebutton} id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
+                        {
+                            parseFloat(this.state.inputValue.replace(",", ".")) > 0
+                                && this.state.inputValue !== '' ?
+                                <p className="possibleWin">&#8592;  possible win  &#8594;</p>
+                                : null
+                        }
+                        <input disabled={this.state.disablebutton} id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue} />
                         <p><sup>* transaction fee is 0.00195 eth</sup></p>
-                    {
-                        formErrors.inputValueE.length > 0 && (
-                            <p className="errorMessage">{formErrors.inputValueE}</p>
-                        )
-                    }
+                        {
+                            formErrors.inputValueE.length > 0 && (
+                                <p className="errorMessage">{formErrors.inputValueE}</p>
+                            )
+                        }
                     </div>
                     <div className="col-sm-3">
-                    {
-                        parseFloat(this.state.inputValue.replace(",",".")) > 0 && this.state.inputValue !== ''?
-                            <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
-                        :null
-                    }
+                        {
+                            parseFloat(this.state.inputValue.replace(",", ".")) > 0 && this.state.inputValue !== '' ?
+                                <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
+                                : null
+                        }
                         <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
                     </div>
                 </div>

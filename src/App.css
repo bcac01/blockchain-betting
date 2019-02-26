@@ -318,3 +318,8 @@ input.error {
   color: white;
   font-size: 20px;
 }
+
+.centered-text {
+  width: 100%;
+  text-align: center;
+}
