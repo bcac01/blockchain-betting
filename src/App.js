@@ -4,7 +4,6 @@ import moment from 'moment-timezone';
 import nodeUrl from './eth-node-config.json';
 import './App.css';
 import Web3 from 'web3';
-import compiledContract from './truffle/build/contracts/BettingApp.json';
 import Signup from './components/signup/Signup';
 import Signin from './components/signin/Signin';
 import Signout from './components/signout/Signout';
@@ -29,23 +28,6 @@ const web3 = new Web3(nodeUrl.url);
 web3.eth.getCoinbase().then(result => {
   const coinbaseAddress = result;
   web3.eth.personal.unlockAccount(coinbaseAddress, 'koliko', 0);
-});
-
-/**
- * Get address from compiled contract
- */
-const contractAddress = compiledContract.networks['300'].address;
-
-/**
- * Get contract balance
- */
-web3.eth.getBalance(contractAddress, function (err, balance) {
-  if (err) {
-    console.error(err);
-  } else {
-    console.log('Contract address: ' + contractAddress);
-    console.log('Contract balance: ' + web3.utils.fromWei(balance, 'ether') + ' eth');
-  }
 });
 
 class App extends Component {

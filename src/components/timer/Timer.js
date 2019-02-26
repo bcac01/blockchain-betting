@@ -50,9 +50,9 @@ class Timer extends Component {
     getTotalBetAmount = () => {
         contractInstance.methods.BetStatistics().call()
         .then((response) => {
-                 global.totalBetAmount= web3.utils.fromWei(response[0],'ether');
-                 global.totalBetDownAmount= web3.utils.fromWei(response[1],'ether');
-                 global.totalBetUpAmount= web3.utils.fromWei(response[2],'ether');
+            global.totalBetAmount= web3.utils.fromWei(response[0],'ether');
+            global.totalBetDownAmount= web3.utils.fromWei(response[1],'ether');
+            global.totalBetUpAmount= web3.utils.fromWei(response[2],'ether');
         });
     }
 
@@ -92,10 +92,12 @@ class Timer extends Component {
                 });
             }
             // filter bets storage
-            let filterdBets = JSON.parse(localStorage.getItem('bets')).filter(bet => {
-                return moment(new Date(response.data.roundTime)).diff(moment(new Date(bet.betTime))) <= 0;
-            });
-            localStorage.setItem('bets', JSON.stringify(filterdBets));
+            if (localStorage.getItem('bets')) {
+                let filterdBets = JSON.parse(localStorage.getItem('bets')).filter(bet => {
+                    return moment(new Date(response.data.roundTime)).diff(moment(new Date(bet.betTime))) <= 0;
+                });
+                localStorage.setItem('bets', JSON.stringify(filterdBets));
+            }
         });
     }
 
