@@ -74,7 +74,6 @@ class App extends Component {
     }
 
     // disable app if node service is down for more than 3 seconds
-    // this.checkService();
     this.serviceTimer = setInterval(() => {
       this.checkService();
       if (this.state.showServiceMsg === true)
@@ -112,7 +111,8 @@ class App extends Component {
         sessionStorage.clear();
         console.log('time not ok');
       }
-      if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 10 &&
+      // disable bet controls if round time is invalid
+      if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 11 &&
         moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') < 3) {
         this.setState({
           showDashboard: true,
