@@ -17,6 +17,7 @@ moment.tz.setDefault("Europe/Belgrade");
 
 global.disablebutton = false;
 global.roundTime = '';
+
 /**
  * Create web3 instance
  */
@@ -45,7 +46,6 @@ class App extends Component {
       showServiceMsg: false,
       disablebutton: false,
       showWithdraw: false,
-      showRoundCheck: false
     }
   }
 
@@ -94,22 +94,19 @@ class App extends Component {
           showServiceMsg: true
         });
         sessionStorage.clear();
-        console.log('time not ok');
-      }
-      // disable bet controls if round time is invalid
-      if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 11 &&
-        moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') < 5) {
-        this.setState({
-          showDashboard: true,
-          showTimer: true,
-          showRoundCheck: false
-        })
       } else {
-        this.setState({
-          showDashboard: false,
-          showTimer: false,
-          showRoundCheck: true
-        })
+        // disable bet  on dashboard if round time is invalid
+        if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 11 && !this.state.showSignin) {
+          this.setState({
+            showDashboard: true,
+            showTimer: true
+          })
+        } else {
+          this.setState({
+            showDashboard: false,
+            showTimer: false
+          })
+        }
       }
     });
   }
@@ -191,15 +188,6 @@ class App extends Component {
                 {timer}
               </div>
             </div>
-            {
-              this.state.showRoundCheck ?
-                <div className="row">
-                  <div className="col">
-                    <h2 className="h2Yellow centered-text">Please wait for new round to start</h2>
-                  </div>
-                </div>
-              : null
-            }
             <div className="row">
               <div className="col">
                 {withdraw}
