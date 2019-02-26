@@ -419,7 +419,7 @@ class Dashboard extends Component {
                     :null
                 }
                 {
-                    JSON.parse(localStorage.getItem('bets')).length > 0 ?
+                    (localStorage.getItem('bets') && JSON.parse(localStorage.getItem('bets')).length > 0) ?
                         <div className="row">
                                 <div className="col-12 bets-list">
                                     <p>Your bets:</p>

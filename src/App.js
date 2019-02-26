@@ -96,7 +96,7 @@ class App extends Component {
 
   checkService = () => {
     axios.get('/update_service/serviceTime.json').then(response => {
-      if (moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') >= 3) {
+      if (moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') >= 5) {
         this.setState({
           showSignin: false,
           showSignout: false,
@@ -113,7 +113,7 @@ class App extends Component {
       }
       // disable bet controls if round time is invalid
       if (moment(new Date()).diff(moment(new Date(global.roundTime)), 'minutes') < 11 &&
-        moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') < 3) {
+        moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') < 5) {
         this.setState({
           showDashboard: true,
           showTimer: true
