@@ -160,12 +160,12 @@ class Dashboard extends Component {
                 currentTimeMinute === 30 ||
                 currentTimeMinute === 40 ||
                 currentTimeMinute === 50) {
-                if (!this.state.checkedForResult) {
+                if (!this.state.checkedForResult)
                     this.checkResults();
-                }
             } else {
                 this.setState({
-                    checkedForResult: false
+                    checkedForResult: false,
+                    showRoundResult: false
                 })
             }
         }, 1000);
@@ -190,19 +190,9 @@ class Dashboard extends Component {
      * Check for bet results
      */
     checkResults = () => {
-        // if (localStorage.getItem('bets')) {
-        //     let localBets = JSON.parse(localStorage.getItem('bets'));
-        //     console.log(localBets);
-            
-        // } else {
-        //     console.log('no bets');
-            
-        // }
-        // get last round winning type
-        console.log('check for round result');
-        
         axios.get('/update_service/ethData.json').then(response => {
-            if (moment(new Date(response.data.lastPayoutTime)).diff(moment(new Date())) < 60000) {
+            if (moment(new Date()).diff(moment(new Date(response.data.lastPayoutTime)), 'seconds') > 0 &&
+                moment(new Date()).diff(moment(new Date(response.data.lastPayoutTime)), 'seconds') < 200) {
                 this.setState({
                     checkedForResult: true
                 })
@@ -224,6 +214,12 @@ class Dashboard extends Component {
     hideRoundResultMsg = () => {
         this.setState({ 
             showRoundResult: false
+        })
+    }
+
+    hideBetStatusMsg = () => {
+        this.setState({
+            betAccepted: null
         })
     }
 
@@ -290,13 +286,19 @@ class Dashboard extends Component {
                                                     });
                                                     // save bet to local storage
                                                     let myBets;
+                                                    let placedBetName;
                                                     if (localStorage.getItem('bets')) {
                                                         myBets = JSON.parse(localStorage.getItem('bets'));
                                                     } else {
                                                         myBets = [];
                                                     }
+                                                    if (placedBetNumber === 1)
+                                                        placedBetName = 'Bet Down';
+                                                    else
+                                                        placedBetName = 'Bet Up';
                                                     myBets.push({
-                                                        'betType': placedBetNumber,
+                                                        'betAmount': this.state.inputValue,
+                                                        'betType': placedBetName,
                                                         'betTime': new Date()
                                                     });
                                                     localStorage.setItem('bets', JSON.stringify(myBets));
@@ -332,35 +334,35 @@ class Dashboard extends Component {
 
         return (
             <div className="dashboard-wrapper">
-            <div className="row">
+                <div className="row">
                 {
                     this.state.showRoundResult ?
                         <div className="col">
                             <div className="alert alert-info alert-dismissible">
-                                <a href="#0" className="close" data-dismiss="alert" aria-label="close" onClick={this.hideRoundResultMsg}>&times;</a>
+                                <a href="#0" className="close" onClick={this.hideRoundResultMsg}>&times;</a>
                                 Round has finished, the winning bet was: {this.state.roundResult}
                             </div>
                         </div>
                     : null
                 }
                 {
-                this.state.betAccepted ?
-                    <div className="col">
-                        <div className="alert alert-success alert-dismissible">
-                        <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
-                            Thank you for your bet.
-                        </div> 
-                    </div>    
-                :null
+                    this.state.betAccepted ?
+                        <div className="col">
+                            <div className="alert alert-success alert-dismissible">
+                                <a href="#0" className="close" onClick={this.hideBetStatusMsg}>&times;</a>
+                                Thank you for your bet.
+                            </div> 
+                        </div>    
+                    :null
                 }
                 {
                     !this.state.betAccepted && this.state.betAccepted != null ? 
-                    <div className="col">
-                        <div className="alert alert-danger alert-dismissible">
-                        <a href="#0" className="close" data-dismiss="alert" aria-label="close">&times;</a>
-                            Your bet was rejected.
+                        <div className="col">
+                            <div className="alert alert-danger alert-dismissible">
+                                <a href="#0" className="close" onClick={this.hideBetStatusMsg}>&times;</a>
+                                Your bet was rejected.
+                            </div>
                         </div>
-                    </div>
                     :null
                 }
                 </div>
@@ -376,51 +378,68 @@ class Dashboard extends Component {
                     </div>
                     <div className="col-sm-6">
                     {
-                            parseFloat(this.state.inputValue.replace(",",".")) > 0 
-                            && this.state.inputValue !== ''?
-                                <p className="possibleWin">&#8592;  possible win  &#8594;</p>
-                            :null
+                        parseFloat(this.state.inputValue.replace(",",".")) > 0 
+                        && this.state.inputValue !== ''?
+                            <p className="possibleWin">&#8592;  possible win  &#8594;</p>
+                        :null
                     }
-                    <input id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
-                    <p><sup>* transaction fee is 0.00195 eth</sup></p>
-                    {formErrors.inputValueE.length > 0 && (
-                        <p className="errorMessage">{formErrors.inputValueE}</p>
-                        )}
+                        <input disabled={this.state.disablebutton} id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue}/>   
+                        <p><sup>* transaction fee is 0.00195 eth</sup></p>
+                    {
+                        formErrors.inputValueE.length > 0 && (
+                            <p className="errorMessage">{formErrors.inputValueE}</p>
+                        )
+                    }
                     </div>
-                    <div className="col-sm-3">{
-                            parseFloat(this.state.inputValue.replace(",",".")) > 0 
-                            && this.state.inputValue !== ''?
-                                <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
-                            :null
-                        }
+                    <div className="col-sm-3">
+                    {
+                        parseFloat(this.state.inputValue.replace(",",".")) > 0 && this.state.inputValue !== ''?
+                            <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
+                        :null
+                    }
                         <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
                     </div>
                 </div>
                 {
-                    this.state.betAccepted?
-                <div className="row">
-                    <div className="col-sm-6 column-in-center">
-                        <h2>Bet placed on: {this.state.placedBet}</h2>
-                        <h2>Stake: {this.state.inputValue} ETH</h2>
-                    </div>
-                </div>
-                :null
+                    this.state.betting?
+                        <div className="loading-wrapper">
+                        <div className="row">
+                            <div className="col-sm-6 col-centered">
+                                <h2>Accepting bet...</h2>
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="col-sm-2 col-centered">
+                                <div className="loader col-centered"></div>
+                            </div>
+                        </div>
+                        </div>
+                    :null
                 }
                 {
-                    this.state.betting?
-                    <div className="loading-wrapper">
-                    <div className="row">
-                        <div className="col-sm-6 col-centered">
-                            <h2>Accepting bet...</h2>
+                    JSON.parse(localStorage.getItem('bets')).length > 0 ?
+                        <div className="row">
+                                <div className="col-12 bets-list">
+                                    <p>Your bets:</p>
+                                    <div className="bets-wrapper">
+                                        <div className="bet-item">
+                                            <div className="bet-amount">Amount</div>
+                                            <div className="bet-type">Type</div>
+                                            <div className="bet-time">Time</div>
+                                        </div>
+                                        {
+                                            JSON.parse(localStorage.getItem('bets')).map(bet =>
+                                                <div className="bet-item" key={bet.betTime}>
+                                                    <div className="bet-amount">{bet.betAmount} eth</div>
+                                                    <div className="bet-type">{bet.betType}</div>
+                                                    <div className="bet-time">{bet.betTime}</div>
+                                                </div>
+                                            )
+                                        }
+                                    </div>
+                                </div>
                         </div>
-                    </div>
-                    <div className="row">
-                        <div className="col-sm-2 col-centered">
-                            <div className="loader col-centered"></div>
-                        </div>
-                    </div>
-                    </div>
-                :null
+                    : null
                 }
             </div>
         );

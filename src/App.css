@@ -291,3 +291,30 @@ input.error {
 {
   text-align: center;
 }
+
+.bets-list {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  color: #fff;
+}
+
+.bets-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.bet-item {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.bet-item > div {
+  width: 33%;
+}
+
+.bets-list > p {
+  width: 100%;
+  color: white;
+  font-size: 20px;
+}

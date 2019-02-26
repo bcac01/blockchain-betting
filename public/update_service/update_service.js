@@ -208,6 +208,7 @@ distributeRewards = () => {
 		} else {
 			ethData.lastWinningBet = 2;
 		}
+		ethData.lastPayoutTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute;
 		const json = JSON.stringify(ethData);
 		fs.writeFile("ethData.json", json, function (err) {
 			if (err) {
@@ -292,7 +293,6 @@ updateTime = () => {
 		currentTime.minute == 40 ||
 		currentTime.minute == 50) &&
 		ethData.lastPayoutTime != currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute) {
-		ethData.lastPayoutTime = currentTime.month + '-' + currentTime.day + '-' + currentTime.year + ' ' + currentTime.hour + ':' + currentTime.minute;
 		distributeRewards();
 	}
 
