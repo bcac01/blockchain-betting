@@ -45,6 +45,7 @@ class App extends Component {
       showServiceMsg: false,
       disablebutton: false,
       showWithdraw: false,
+      showRoundCheck: false
     }
   }
 
@@ -100,12 +101,14 @@ class App extends Component {
         moment(new Date()).diff(moment(new Date(response.data.updateTime)), 'seconds') < 5) {
         this.setState({
           showDashboard: true,
-          showTimer: true
+          showTimer: true,
+          showRoundCheck: false
         })
       } else {
         this.setState({
           showDashboard: false,
-          showTimer: false
+          showTimer: false,
+          showRoundCheck: true
         })
       }
     });
@@ -188,9 +191,18 @@ class App extends Component {
                 {timer}
               </div>
             </div>
+            {
+              this.state.showRoundCheck ?
+                <div className="row">
+                  <div className="col">
+                    <h2 className="h2Yellow centered-text">Please wait for new round to start</h2>
+                  </div>
+                </div>
+              : null
+            }
             <div className="row">
               <div className="col">
-              {withdraw}
+                {withdraw}
               </div>
             </div>
             <div className="row">
