@@ -200,6 +200,7 @@ class Dashboard extends Component {
                 this.setState({
                     roundResult: betWon,
                     showRoundResult: true,
+                    betMinAccepted: false,
                     betAccepted: null,
                 })
             }
