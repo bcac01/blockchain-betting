@@ -8,6 +8,8 @@ const nodeUrl = require('../../src/eth-node-config'),
 	contractAddress = compiledContract.networks['300'].address,
 	contractInstance = new web3.eth.Contract(compiledContract.abi, contractAddress);
 
+moment.tz.setDefault("Europe/Belgrade");
+
 let coinbaseAddress = '',
 	availableAddresses = 0,
 	creatingAddress = false,
@@ -232,7 +234,6 @@ distributeRewards = () => {
 							console.log(logTime);
 							console.log('Rewards distributed, gas spent: ' + parseInt(receipt.gasUsed));
 							console.log('------------------------');
-							console.log(global.currentBalance);
 						}).catch(err => {
 							const logTime = moment().tz("Europe/Belgrade").format();
 							console.log(logTime + ': ' + err);
