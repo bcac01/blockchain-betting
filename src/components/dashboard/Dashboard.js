@@ -37,7 +37,6 @@ class Dashboard extends Component {
             inputValue: '',
             betAccepted: null,
             placedBet: '',
-            disablebutton: false,
             formErrors: {
             inputValueE: ""
             },
@@ -170,14 +169,10 @@ class Dashboard extends Component {
     };
     
     changeBtnStateTrue = () =>{
-        this.setState({
-            disablebutton : true
-        })
+        global.disablebutton = true;
     }
     changeBtnStateFalse = () =>{
-        this.setState({
-            disablebutton : false
-        })
+        global.disablebutton = false;
     }
 
     /**
@@ -394,7 +389,7 @@ class Dashboard extends Component {
                                 <p className="possibleWin">{this.state.possibleUpWinning.toFixed(10)}</p>
                                 : null
                         }
-                        <button disabled={this.state.disablebutton} className="betup" name="bet up" onClick={this.handleBet}>Bet up</button>
+                        <button disabled={global.disablebutton} className="betup" name="bet up" onClick={this.handleBet}>Bet up</button>
                     </div>
                     <div className="col-sm-6">
                         {
@@ -403,7 +398,7 @@ class Dashboard extends Component {
                                 <p className="possibleWin">&#8592;  possible win  &#8594;</p>
                                 : null
                         }
-                        <input disabled={this.state.disablebutton} id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue} />
+                        <input disabled={global.disablebutton} id="inputCenteredText" name="inputValue" onChange={this.updateValue} className={formErrors.inputValueE.length > 0 ? "error" : null} type="number" placeholder="Bet value (ETH)" value={this.state.inputValue} />
                         <p><sup>* transaction fee is 0.00195 eth</sup></p>
                         {
                             formErrors.inputValueE.length > 0 && (
@@ -417,7 +412,7 @@ class Dashboard extends Component {
                                 <p className="possibleWin">{this.state.possibleDownWinning.toFixed(10)}</p>
                                 : null
                         }
-                        <button disabled={this.state.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
+                        <button disabled={global.disablebutton} className="betdown" name="bet down" onClick={this.handleBet}>Bet down</button>
                     </div>
                 </div>
                 {

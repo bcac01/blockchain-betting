@@ -56,6 +56,16 @@ class Withdraw extends Component {
             successAlert: false,
         })
     }
+    
+    /**
+    * Get user balance
+    */
+    getUserBalance = () => {
+        web3.eth.getBalance(sessionStorage.getItem('address')).then((balance)=> {
+            global.currentBalance= web3.utils.fromWei(balance,'ether')
+        })
+    }
+
     // update value state
     updateAddress = (e) => {
     e.preventDefault();
@@ -132,6 +142,7 @@ class Withdraw extends Component {
                             successAlert: !this.state.successAlert,
                             successInfo: !this.state.successInfo,
                         })
+                        this.getUserBalance();
                         click();
                     })
                     .catch((err) => {
