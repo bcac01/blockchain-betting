@@ -296,7 +296,7 @@ class Dashboard extends Component {
                                                     myBets.push({
                                                         'betAmount': this.state.inputValue,
                                                         'betType': placedBetName,
-                                                        'betTime': moment(new Date()).format('DD-MMM-YYYY HH:mm')
+                                                        'betTime': moment(new Date()).format('DD-MMM-YYYY HH:mm:ss')
                                                     });
                                                     this.getTotalBetAmount();
                                                     this.getUserBalance();
