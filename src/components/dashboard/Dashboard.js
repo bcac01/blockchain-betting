@@ -48,7 +48,8 @@ class Dashboard extends Component {
             realBetAmount : 0,
             showRoundResult: false,
             roundResult: '',
-            checkedForResult: false
+            checkedForResult: false,
+            betMinAccepted: false
         }
     
     /**
@@ -138,7 +139,8 @@ class Dashboard extends Component {
         this.changeBtnStateFalse();
         this.setState({
             betAccepted: false,
-            betting: false
+            betting: false,
+            betMinAccepted: false
         });
     }
 
@@ -213,6 +215,12 @@ class Dashboard extends Component {
     hideBetStatusMsg = () => {
         this.setState({
             betAccepted: null
+        })
+    }
+    
+    hideMinBetStatusMsg = () => {
+        this.setState({
+            betMinAccepted: false
         })
     }
 
@@ -300,6 +308,7 @@ class Dashboard extends Component {
                                                     this.changeBtnStateFalse();
                                                     this.setState({
                                                         inputValue: '',
+                                                        betMinAccepted: false
                                                     })
                                                     console.log('Bet accepted, gas spent: ' + receipt.gasUsed);
                                                 } else {
@@ -322,7 +331,9 @@ class Dashboard extends Component {
         else
         {
             this.setState({
-                betAccepted: false
+                betMinAccepted: true,
+                betAccepted: null,
+                showRoundResult: false
             })
         }
     }
@@ -359,6 +370,16 @@ class Dashboard extends Component {
                             <div className="alert alert-danger alert-dismissible">
                                 <a href="#0" className="close" onClick={this.hideBetStatusMsg}>&times;</a>
                                 Your bet was rejected.
+                            </div>
+                        </div>
+                    :null
+                }
+                {
+                    this.state.betMinAccepted ? 
+                        <div className="col">
+                            <div className="alert alert-danger alert-dismissible">
+                                <a href="#0" className="close" onClick={this.hideMinBetStatusMsg}>&times;</a>
+                                Your bet was rejected. Minimum bet is 0.005.
                             </div>
                         </div>
                     :null

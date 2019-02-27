@@ -57,6 +57,9 @@ class Timer extends Component {
     }
 
     componentDidMount() {
+        this.betAmountTimer = setInterval(() => {
+            this.getTotalBetAmount();
+        }, 5000);
         this.updateRoundTime();
         this.updateTimes();
         this.timer = setInterval(() => {
@@ -116,6 +119,7 @@ class Timer extends Component {
 
     componentWillUnmount = () => {
         clearTimeout(this.timer);
+        clearTimeout(this.betAmountTimer);
     };
 
     render() {
